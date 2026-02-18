@@ -18,12 +18,15 @@ public class ItemNota {
     @JoinColumn(name = "nota_id")
     private Nota nota;
 
+    @ManyToOne
+    @JoinColumn(name = "produto_id")
+    private Produto produto;
+
     private Integer quantidade;
     private BigDecimal precoUnitarioSnapshot;
 
     public BigDecimal getSubTotal() {
         return precoUnitarioSnapshot.multiply(BigDecimal.valueOf(quantidade));
     }
-
 
 }
