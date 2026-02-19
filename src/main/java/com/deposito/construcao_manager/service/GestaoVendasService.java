@@ -17,7 +17,7 @@ public class GestaoVendasService {
     @Autowired private NotaRepository notaRepository;
 
     @Transactional
-    public NotaSaidaDTO registrarVenda(NotaEntradaDTO dadosVenda) {
+    public NotaSaidaDTO cadastrarVenda(NotaEntradaDTO dadosVenda) {
         Cliente cliente = clienteRepository.findById((dadosVenda.getClienteId()))
                 .orElseThrow(()-> new IllegalArgumentException("Cliente não encontrado"));
 

@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/menu/vendas")
+@RequestMapping("/")
 public class VendaController {
 
     @Autowired
     private GestaoVendasService service;
 
-    @PostMapping
+    @PostMapping("/cadastrar_venda")
     public ResponseEntity<NotaSaidaDTO> criarVenda(@RequestBody NotaEntradaDTO notaEntradaDTO) {
-        NotaSaidaDTO notaSaidaDTO = service.registrarVenda(notaEntradaDTO);
+        NotaSaidaDTO notaSaidaDTO = service.cadastrarVenda(notaEntradaDTO);
         return ResponseEntity.ok(notaSaidaDTO);
     }
 }
