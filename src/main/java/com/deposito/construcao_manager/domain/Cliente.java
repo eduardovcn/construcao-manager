@@ -18,4 +18,7 @@ public class Cliente {
     private String endereco;
     private String celular;
 
+
+    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Nota nota;
 }
