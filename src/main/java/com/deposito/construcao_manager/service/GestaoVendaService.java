@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 @Service
-public class GestaoVendasService {
+public class GestaoVendaService {
 
     @Autowired private ProdutoRepository produtoRepository;
     @Autowired private ClienteRepository clienteRepository;
