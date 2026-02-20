@@ -8,4 +8,8 @@ import java.util.Optional;
 public interface ProdutoRepository extends JpaRepository<Produto, String> {
         List<Produto> findByNomeContainingIgnoreCase(String nome);
         Optional<Produto> findById(Long id);
+
+    void deleteById(Long id);
+
+    boolean existsById(Long id);
 }
