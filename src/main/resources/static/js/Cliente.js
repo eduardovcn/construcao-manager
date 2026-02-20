@@ -1,6 +1,6 @@
 async function registrarCliente() {
     const nomeInput = document.getElementById('nomeCompleto').value;
-    const emailInput = document.getElementById('email').value; // Se não for usar no Java, pode remover futuramente
+    const emailInput = document.getElementById('email').value;
     const cpfInput = document.getElementById('cpf').value;
     const enderecoInput = document.getElementById('endereco').value;
     const telefoneInput = document.getElementById('telefone').value;
@@ -10,7 +10,7 @@ async function registrarCliente() {
         return;
     }
 
-    // 1ª CORREÇÃO: Nomes idênticos aos atributos do seu DadosClienteEntradaDTO no Java
+
     const clienteDTO = {
         nomeCompleto: nomeInput,
         email: emailInput,
@@ -20,7 +20,7 @@ async function registrarCliente() {
     };
 
     try {
-        // 2ª CORREÇÃO: A URL completa juntando o Controller com o PostMapping
+
         const resposta = await fetch('/clientes/cadastrar_cliente', {
             method: 'POST',
             headers: {

@@ -1,6 +1,4 @@
-/**
- * Função assíncrona para enviar nova venda ao Backend Spring Boot
- */
+
 async function registrarVenda() {
     // 1. Captura os dados dos inputs
     const clienteIdInput = document.getElementById('clienteId').value;
@@ -59,24 +57,24 @@ async function registrarVenda() {
     }
 }
 
-// O evento 'DOMContentLoaded' garante que a função só rode quando a página terminar de carregar
+// garante que a função só rode quando a página terminar de carregar
 document.addEventListener("DOMContentLoaded", function() {
     carregarUltimasVendas();
 });
 
 async function carregarUltimasVendas() {
     try {
-        // ATENÇÃO: Verifique se a rota do seu Java para listar vendas é exatamente essa
+
         const resposta = await fetch('/vendas/listar_vendas');
 
         if (resposta.ok) {
             const vendas = await resposta.json();
             const tbody = document.getElementById('tabelaVendasBody');
 
-            // Limpa a mensagem de "Carregando..."
+
             tbody.innerHTML = '';
 
-            // Se não houver vendas no banco
+
             if (vendas.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Nenhuma venda registrada ainda.</td></tr>`;
                 return;
@@ -120,10 +118,10 @@ async function carregarUltimasVendas() {
     }
 }
 
-// Função auxiliar simples para formatar a data que vem do Java (ex: de "2026-02-18" para "18/02/2026")
+// Função auxiliar para formatar a data que vem do Java (ex: de "2026-02-18" para "18/02/2026")
 function formatarData(dataString) {
     if (!dataString) return '--/--/----';
-    const partes = dataString.split('-'); // Supondo formato YYYY-MM-DD
+    const partes = dataString.split('-');
     if (partes.length === 3) {
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
