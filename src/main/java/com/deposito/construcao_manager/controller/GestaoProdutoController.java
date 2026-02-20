@@ -18,8 +18,8 @@ public class GestaoProdutoController {
     @Autowired
     private GestaoProdutoService produtoService;
 
-    @PostMapping("/criar_produto")
-    public ResponseEntity<DadosProdutoSaidaDTO> criarProduto(@RequestBody DadosProdutoEntradaDTO dadosProdutoEntradaDTO) {
+    @PostMapping("/cadastrar_produto")
+    public ResponseEntity<DadosProdutoSaidaDTO> cadastrarProduto(@RequestBody DadosProdutoEntradaDTO dadosProdutoEntradaDTO) {
         DadosProdutoSaidaDTO produtoCriado = produtoService.criarProduto(dadosProdutoEntradaDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoCriado);
     }

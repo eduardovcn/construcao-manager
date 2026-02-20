@@ -15,6 +15,7 @@ public class Cliente {
     @Column(nullable = false)
     private String nomeCompleto;
     private String cpf;
+    private String email;
     private String endereco;
     private String celular;
 

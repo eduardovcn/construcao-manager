@@ -8,12 +8,14 @@ import lombok.Data;
 @Data
 public class DadosProdutoSaidaDTO {
 
+    private Long id;
     private String nome;
     private BigDecimal preco;
     private Integer quantidadeEstoque;
 
     public static DadosProdutoSaidaDTO from(Produto produtoSalvo) {
         DadosProdutoSaidaDTO produto_final = new DadosProdutoSaidaDTO();
+        produto_final.setId(produtoSalvo.getId());
         produto_final.setNome(produtoSalvo.getNome());
         produto_final.setPreco(produtoSalvo.getPreco());
         produto_final.setQuantidadeEstoque(produtoSalvo.getQuantidadeEstoque());

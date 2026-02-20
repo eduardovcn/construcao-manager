@@ -11,6 +11,7 @@ public class DadosClienteSaidaDTO {
     Long id;
     String nomeCompleto;
     String cpf;
+    String email;
     String endereco;
     String celular;
     Nota nota;
@@ -23,6 +24,7 @@ public class DadosClienteSaidaDTO {
                 clienteSalvo.getCpf(),
                 clienteSalvo.getEndereco(),
                 clienteSalvo.getCelular(),
+                clienteSalvo.getEmail(),
                 clienteSalvo.getNota()
 
         );

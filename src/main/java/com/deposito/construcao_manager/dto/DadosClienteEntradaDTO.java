@@ -7,6 +7,7 @@ public class DadosClienteEntradaDTO {
 
     private String nomeCompleto;
     private String cpf;
+    private String email;
     private String endereco;
     private String celular;
 }
