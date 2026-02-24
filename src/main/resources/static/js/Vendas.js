@@ -26,7 +26,7 @@ async function registrarVenda() {
 
     try {
         // 3. Envia requisição POST
-        const resposta = await fetch('/cadastrar_venda', {
+        const resposta = await fetch('/vendas/cadastrar_venda', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -46,6 +46,9 @@ async function registrarVenda() {
 
             // Limpa o formulário para a próxima venda
             document.getElementById('formVenda').reset();
+
+
+            carregarUltimasVendas();
 
         } else {
             // Se o servidor retornar erro (ex: Produto não encontrado ou sem estoque)
