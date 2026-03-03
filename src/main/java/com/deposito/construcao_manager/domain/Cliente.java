@@ -14,10 +14,15 @@ public class Cliente {
 
     @Column(nullable = false)
     private String nomeCompleto;
+    private String celular;
+
+
     private String cpf;
     private String email;
     private String endereco;
-    private String celular;
+
+
+
 
 
     @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -5,10 +5,6 @@ async function registrarCliente() {
     const enderecoInput = document.getElementById('endereco').value;
     const telefoneInput = document.getElementById('telefone').value;
 
-    if (!nomeInput || !emailInput || !cpfInput ||!enderecoInput || !telefoneInput) {
-        alert("Por favor, preencha todos os campos obrigatórios.");
-        return;
-    }
 
 
     const clienteDTO = {

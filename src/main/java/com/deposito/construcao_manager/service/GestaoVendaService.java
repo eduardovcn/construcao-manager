@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GestaoVendaService {
@@ -52,5 +54,17 @@ public class GestaoVendaService {
         Nota notaSalva = notaRepository.save(nota);
         return NotaSaidaDTO.from(notaSalva);
 
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<NotaSaidaDTO> listarTodasVendas() {
+
+        List<Nota> notas = notaRepository.findAll();
+
+
+        return notas.stream()
+                .map(NotaSaidaDTO::from)
+                .collect(Collectors.toList());
     }
 }
