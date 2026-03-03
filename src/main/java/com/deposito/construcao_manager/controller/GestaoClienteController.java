@@ -1,6 +1,5 @@
 package com.deposito.construcao_manager.controller;
 
-import com.deposito.construcao_manager.domain.Cliente;
 import com.deposito.construcao_manager.dto.DadosClienteEntradaDTO;
 import com.deposito.construcao_manager.dto.DadosClienteSaidaDTO;
 import com.deposito.construcao_manager.service.GestaoClienteService;
@@ -54,12 +53,9 @@ public class GestaoClienteController {
 
     @DeleteMapping("/deletar_cliente/{id}")
     public ResponseEntity<Void> deletarCliente(@PathVariable Long id) {
-        try {
-            gestaoClienteService.deletarCliente(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        gestaoClienteService.deletarCliente(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
 
