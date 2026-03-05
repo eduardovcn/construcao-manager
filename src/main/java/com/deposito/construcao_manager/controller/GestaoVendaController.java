@@ -28,9 +28,7 @@ public class GestaoVendaController {
     public ResponseEntity<List<NotaSaidaDTO>> listarVendas() {
         List<NotaSaidaDTO> listaDeVendas = service.listarTodasVendas();
 
-        // Retorna 200 OK sempre. Se não tiver venda, o Spring converte para um '[]' (JSON vazio).
         return ResponseEntity.status(HttpStatus.CREATED).body(listaDeVendas);
     }
-
 
 }

@@ -48,7 +48,6 @@ public class GestaoVendaService {
 
             nota.adicionarItem(itemNota); // Adiciona e calcula total
 
-
         }
 
         Nota notaSalva = notaRepository.save(nota);
@@ -62,9 +61,9 @@ public class GestaoVendaService {
 
         List<Nota> notas = notaRepository.findAll();
 
-
         return notas.stream()
                 .map(NotaSaidaDTO::from)
                 .collect(Collectors.toList());
     }
+
 }
