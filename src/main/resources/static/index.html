@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramalho Materiais de Construção</title>
+    <title>LM Materiais de Construção</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,12 +17,12 @@
 
         <nav class="col-md-2 d-none d-md-block sidebar p-0">
             <div class="brand-logo">
-                <i class="fas fa-hammer"></i> Ramalho Materiais de Construção
+                <i class="fas fa-hammer"></i> LM Materiais de Construção
             </div>
             <div class="pt-3">
                 <a class="nav-link active" href="#"><i class="fas fa-home"></i> Início</a>
                 <a class="nav-link" href="#"><i class="fas fa-file-invoice-dollar"></i> Vendas</a>
-                <a class="nav-link" href="#"><i class="fas fa-users"></i> Clientes</a>
+               <a class="nav-link" href="#" onclick="carregarClientes(); return false;"><i class="fas fa-users"></i> Clientes</a>
                 <a class="nav-link" href="#"><i class="fas fa-box"></i> Estoque</a>
             </div>
         </nav>
@@ -84,6 +84,39 @@
                                         <i class="fas fa-spinner fa-spin"></i> Carregando últimas vendas...
                                     </td>
                                 </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 d-none" id="telaClientes">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 font-weight-bold" style="color: var(--azul-profundo);">Lista de Clientes</h5>
+                        <div>
+                            <button class="btn btn-sm btn-info text-white me-2" data-bs-toggle="modal" data-bs-target="#modalAtualizarCliente">
+                                <i class="fas fa-user-edit"></i> Atualizar Dados
+                            </button>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoCliente">
+                                <i class="fas fa-plus"></i> Novo Cliente
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 tabela-custom">
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="ps-4">ID</th>
+                                    <th scope="col">Nome</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">CPF</th>
+                                    <th scope="col">Endereço</th>
+                                    <th scope="col">Celular</th>
+                                    <th scope="col">Pedidos</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tabelaClientes">
                                 </tbody>
                             </table>
                         </div>
@@ -168,6 +201,92 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-warning" onclick="registrarCliente()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAtualizarCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-info">
+                <h5 class="modal-title"><i class="fas fa-user-edit"></i> Atualizar Cliente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAtualizarCliente">
+                    <div class="mb-3">
+                        <label for="idAtualizar" class="form-label text-info fw-bold">ID do Cliente a ser atualizado <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control border-info" id="idAtualizar" required placeholder="Ex: 2">
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <label for="nomeAtualizar" class="form-label">Novo Nome</label>
+                        <input type="text" class="form-control" id="nomeAtualizar">
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailAtualizar" class="form-label">Novo Email</label>
+                        <input type="email" class="form-control" id="emailAtualizar">
+                    </div>
+                    <div class="mb-3">
+                        <label for="cpfAtualizar" class="form-label">Novo CPF</label>
+                        <input type="text" class="form-control" id="cpfAtualizar">
+                    </div>
+                    <div class="mb-3">
+                        <label for="enderecoAtualizar" class="form-label">Novo Endereço</label>
+                        <input type="text" class="form-control" id="enderecoAtualizar">
+                    </div>
+                    <div class="mb-3">
+                        <label for="telefoneAtualizar" class="form-label">Novo Telefone</label>
+                        <input type="tel" class="form-control" id="telefoneAtualizar">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-info text-white" onclick="atualizarCliente()">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetalhesVenda" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color: var(--azul-profundo);">
+                <h5 class="modal-title"><i class="fas fa-file-invoice-dollar"></i> Detalhes da Venda #<span id="detalheVendaId"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Cliente:</strong> <span id="detalheVendaCliente"></span></p>
+                        <p class="mb-1"><strong>Data Emissão:</strong> <span id="detalheVendaData"></span></p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-1"><strong>Status:</strong> <span id="detalheVendaStatus" class="badge bg-success"></span></p>
+                        <p class="mb-1 fs-5"><strong>Total:</strong> <span id="detalheVendaTotal" class="text-success fw-bold"></span></p>
+                    </div>
+                </div>
+                <hr>
+                <h6>Itens do Pedido</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Produto</th>
+                            <th>Qtd</th>
+                            <th>Preço Unit.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaDetalheItens">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>

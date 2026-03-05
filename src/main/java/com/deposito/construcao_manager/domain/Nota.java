@@ -1,6 +1,7 @@
 package com.deposito.construcao_manager.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,7 @@ public class Nota {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
@@ -41,4 +43,6 @@ public class Nota {
         item.setNota(this);
         this.valorTotal = this.valorTotal.add(item.getSubTotal());
     }
+
+
 }

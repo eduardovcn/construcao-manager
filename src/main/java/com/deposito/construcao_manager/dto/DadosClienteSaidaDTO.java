@@ -3,9 +3,9 @@ package com.deposito.construcao_manager.dto;
 import com.deposito.construcao_manager.domain.Cliente;
 import com.deposito.construcao_manager.domain.Nota;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties; // <-- IMPORT NOVO
 import lombok.Getter;
 import lombok.Setter;
-
 
 @Getter
 @Setter
@@ -26,10 +26,12 @@ public class DadosClienteSaidaDTO {
     private String email;
     private String endereco;
     private String celular;
+
+    // A MÁGICA AQUI: Traz a nota com todas as vendas, mas quebra o loop infinito!
+    @JsonIgnoreProperties("cliente")
     private Nota nota;
 
     public static DadosClienteSaidaDTO from(Cliente clienteSalvo) {
-
         DadosClienteSaidaDTO dto = new DadosClienteSaidaDTO();
         dto.setId(clienteSalvo.getId());
         dto.setNomeCompleto(clienteSalvo.getNomeCompleto());
@@ -37,10 +39,10 @@ public class DadosClienteSaidaDTO {
         dto.setEndereco(clienteSalvo.getEndereco());
         dto.setCelular(clienteSalvo.getCelular());
         dto.setEmail(clienteSalvo.getEmail());
+
+        // Mantém a sua lógica original intacta!
         dto.setNota(clienteSalvo.getNota());
 
         return dto;
     }
 }
-
-
