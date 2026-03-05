@@ -27,12 +27,9 @@ public class GestaoProdutoService {
     }
 
     public List<DadosProdutoSaidaDTO> listarProdutos() {
-        java.util.List<Produto> produtos = produtoRepository.findAll();
-        java.util.List<DadosProdutoSaidaDTO> produtosDTO = new ArrayList<>();
-        for (Produto produto : produtos) {
-            produtosDTO.add(DadosProdutoSaidaDTO.from(produto));
-        }
-        return produtosDTO;
+        List<Produto> produtos = produtoRepository.findAll();
+
+        return produtos.stream().map(DadosProdutoSaidaDTO::from).toList();
     }
 
     public DadosProdutoSaidaDTO atualizarProduto(Long id, DadosProdutoEntradaDTO dadosProdutoEntradaDTO) {
