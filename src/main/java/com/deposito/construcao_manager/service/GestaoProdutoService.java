@@ -39,9 +39,15 @@ public class GestaoProdutoService {
         Produto produtoExistente = produtoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));
 
-        produtoExistente.setNome(dadosProdutoEntradaDTO.getNome());
-        produtoExistente.setPreco(dadosProdutoEntradaDTO.getPreco());
-        produtoExistente.setQuantidadeEstoque(dadosProdutoEntradaDTO.getQuantidadeEstoque());
+        if (dadosProdutoEntradaDTO.getNome() != null) {
+            produtoExistente.setNome(dadosProdutoEntradaDTO.getNome());
+        }
+        if (dadosProdutoEntradaDTO.getPreco() != null) {
+            produtoExistente.setPreco(dadosProdutoEntradaDTO.getPreco());
+        }
+        if (dadosProdutoEntradaDTO.getQuantidadeEstoque() != null) {
+            produtoExistente.setQuantidadeEstoque(dadosProdutoEntradaDTO.getQuantidadeEstoque());
+        }
 
         Produto produtoAtualizado = produtoRepository.save(produtoExistente);
         return DadosProdutoSaidaDTO.from(produtoAtualizado);

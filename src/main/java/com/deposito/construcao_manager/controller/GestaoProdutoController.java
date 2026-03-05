@@ -30,7 +30,7 @@ public class GestaoProdutoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(produtos);
     }
 
-    @PostMapping("/atualizar_produto/{id}")
+    @PatchMapping("/atualizar_produto/{id}")
     public ResponseEntity<DadosProdutoSaidaDTO> atualizarProduto(@PathVariable Long id, @RequestBody DadosProdutoEntradaDTO dadosProdutoEntradaDTO) {
         DadosProdutoSaidaDTO produtoAtualizado = produtoService.atualizarProduto(id, dadosProdutoEntradaDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoAtualizado);
