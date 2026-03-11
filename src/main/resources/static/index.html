@@ -17,108 +17,162 @@
 
         <nav class="col-md-2 d-none d-md-block sidebar p-0">
             <div class="brand-logo">
-                <i class="fas fa-hammer"></i> LM Materiais de Construção
+                <i class="fas fa-hammer"></i> LM Materiais
             </div>
-            <div class="pt-3">
-                <a class="nav-link active" href="#"><i class="fas fa-home"></i> Início</a>
-                <a class="nav-link" href="#"><i class="fas fa-file-invoice-dollar"></i> Vendas</a>
-               <a class="nav-link" href="#" onclick="carregarClientes(); return false;"><i class="fas fa-users"></i> Clientes</a>
-                <a class="nav-link" href="#"><i class="fas fa-box"></i> Estoque</a>
+            <div class="pt-3" id="menuLateral">
+                <a class="nav-link active" href="#" onclick="mudarTela('telaInicio', this); return false;"><i class="fas fa-home"></i> Início</a>
+                <a class="nav-link" href="#" onclick="mudarTela('telaVendas', this); return false;"><i class="fas fa-file-invoice-dollar"></i> Vendas</a>
+                <a class="nav-link" href="#" onclick="mudarTela('telaClientes', this); return false;"><i class="fas fa-users"></i> Clientes</a>
+                <a class="nav-link" href="#" onclick="mudarTela('telaEstoque', this); return false;"><i class="fas fa-box"></i> Estoque</a>
             </div>
         </nav>
 
         <main class="col-md-10 ms-sm-auto px-0">
             <header class="main-header d-flex justify-content-between align-items-center">
-                <h1 class="page-title">Painel de Controle</h1>
+                <h1 class="page-title" id="tituloPagina">Painel de Controle</h1>
                 <button class="btn btn-outline-danger btn-sm">Sair <i class="fas fa-sign-out-alt"></i></button>
             </header>
 
-            <div class="container-fluid px-4">
+            <div class="container-fluid px-4 py-4">
 
-                <div class="row g-4 mb-5">
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="btn-zao" data-bs-toggle="modal" data-bs-target="#modalNovaVenda">
-                            <i class="fas fa-cart-plus"></i>
-                            <h4>Nova Venda</h4>
-                            <p>Registrar pedido e gerar nota</p>
+                <div id="telaInicio" class="tela-conteudo">
+                    <div class="row g-4 mb-5">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="btn-zao" data-bs-toggle="modal" data-bs-target="#modalNovaVenda">
+                                <i class="fas fa-cart-plus"></i>
+                                <h4>Nova Venda</h4>
+                                <p>Registrar pedido e gerar nota</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="btn-zao" data-bs-toggle="modal" data-bs-target="#modalNovoCliente">
-                            <i class="fas fa-user-plus"></i>
-                            <h4>Novo Cliente</h4>
-                            <p>Cadastrar comprador</p>
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="btn-zao" data-bs-toggle="modal" data-bs-target="#modalNovoCliente">
+                                <i class="fas fa-user-plus"></i>
+                                <h4>Novo Cliente</h4>
+                                <p>Cadastrar comprador</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="btn-zao" data-bs-toggle="modal" data-bs-target="#modalNovoProduto">
-                            <i class="fas fa-box"></i>
-                            <h4>Cadastrar Produto</h4>
-                            <p>Adicionar item ao estoque</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="m-0 font-weight-bold" style="color: var(--azul-profundo);">Últimas Vendas Realizadas</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0 tabela-custom">
-                                <thead>
-                                <tr>
-                                    <th scope="col" class="ps-4"># Nota</th>
-                                    <th scope="col">Cliente</th>
-                                    <th scope="col">Data</th>
-                                    <th scope="col">Valor Total</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Ações</th>
-                                </tr>
-                                </thead>
-                                <tbody id="tabelaVendasBody">
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">
-                                        <i class="fas fa-spinner fa-spin"></i> Carregando últimas vendas...
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="btn-zao" data-bs-toggle="modal" data-bs-target="#modalNovoProduto">
+                                <i class="fas fa-box"></i>
+                                <h4>Cadastrar Produto</h4>
+                                <p>Adicionar item ao estoque</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 d-none" id="telaClientes">
-                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 font-weight-bold" style="color: var(--azul-profundo);">Lista de Clientes</h5>
-                        <div>
-                            <button class="btn btn-sm btn-info text-white me-2" data-bs-toggle="modal" data-bs-target="#modalAtualizarCliente">
-                                <i class="fas fa-user-edit"></i> Atualizar Dados
-                            </button>
-                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoCliente">
-                                <i class="fas fa-plus"></i> Novo Cliente
-                            </button>
+                <div id="telaVendas" class="tela-conteudo d-none">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="m-0 font-weight-bold" style="color: var(--azul-profundo);">Histórico de Vendas</h5>
+
+                            <div class="d-flex gap-2">
+                                <select class="form-select form-select-sm" id="filtroTempoVendas" onchange="aplicarFiltroVendas()">
+                                    <option value="hoje">Hoje</option>
+                                    <option value="mes">Este Mês</option>
+                                    <option value="ano">Este Ano</option>
+                                    <option value="todas" selected>Todas as Vendas</option>
+                                </select>
+                                <button class="btn btn-sm btn-success text-nowrap" data-bs-toggle="modal" data-bs-target="#modalNovaVenda">
+                                    <i class="fas fa-plus"></i> Nova Venda
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 tabela-custom">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col" class="ps-4"># Nota</th>
+                                        <th scope="col">Cliente</th>
+                                        <th scope="col">Data</th>
+                                        <th scope="col">Valor Total</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Ações</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tabelaVendasBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            Nenhuma venda para exibir.
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0 tabela-custom">
-                                <thead>
-                                <tr>
-                                    <th scope="col" class="ps-4">ID</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">CPF</th>
-                                    <th scope="col">Endereço</th>
-                                    <th scope="col">Celular</th>
-                                    <th scope="col">Pedidos</th>
-                                </tr>
-                                </thead>
-                                <tbody id="tabelaClientes">
-                                </tbody>
-                            </table>
+                </div>
+
+                <div id="telaClientes" class="tela-conteudo d-none">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="m-0 font-weight-bold" style="color: var(--azul-profundo);">Lista de Clientes</h5>
+                            <div>
+                                <button class="btn btn-sm btn-info text-white me-2" data-bs-toggle="modal" data-bs-target="#modalAtualizarCliente">
+                                    <i class="fas fa-user-edit"></i> Atualizar Dados
+                                </button>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoCliente">
+                                    <i class="fas fa-plus"></i> Novo Cliente
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 tabela-custom">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col" class="ps-4">ID</th>
+                                        <th scope="col">Nome</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">CPF</th>
+                                        <th scope="col">Endereço</th>
+                                        <th scope="col">Celular</th>
+                                        <th scope="col">Ações</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tabelaClientes">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">Carregando clientes...</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="telaEstoque" class="tela-conteudo d-none">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="m-0 font-weight-bold" style="color: var(--azul-profundo);">Controle de Estoque</h5>
+                            <div>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoProduto">
+                                    <i class="fas fa-plus"></i> Novo Produto
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 tabela-custom">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col" class="ps-4">ID</th>
+                                        <th scope="col">Nome do Produto</th>
+                                        <th scope="col">Preço (R$)</th>
+                                        <th scope="col">Estoque Atual</th>
+                                        <th scope="col">Ações</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tabelaEstoqueBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">Carregando estoque...</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -216,7 +270,7 @@
             <div class="modal-body">
                 <form id="formAtualizarCliente">
                     <div class="mb-3">
-                        <label for="idAtualizar" class="form-label text-info fw-bold">ID do Cliente a ser atualizado <span class="text-danger">*</span></label>
+                        <label for="idAtualizar" class="form-label text-info fw-bold">ID do Cliente <span class="text-danger">*</span></label>
                         <input type="number" class="form-control border-info" id="idAtualizar" required placeholder="Ex: 2">
                     </div>
                     <hr>
@@ -329,7 +383,7 @@
 <script src="/js/Produto.js"></script>
 <script src="/js/Vendas.js"></script>
 
+<script src="/js/Tela.js"></script>
 
 </body>
 </html>
-
