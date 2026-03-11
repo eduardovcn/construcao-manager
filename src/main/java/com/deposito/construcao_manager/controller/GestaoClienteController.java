@@ -51,11 +51,19 @@ public class GestaoClienteController {
         }
     }
 
-    @DeleteMapping("/deletar_cliente/{id}")
-    public ResponseEntity<Void> deletarCliente(@PathVariable Long id) {
-        gestaoClienteService.deletarCliente(id);
+    @PatchMapping("/inativar_cliente/{id}")
+    public ResponseEntity<Void> inativarCliente(@PathVariable Long id) {
+        gestaoClienteService.inativarCliente(id);
 
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/reativar_cliente/{id}")
+    public ResponseEntity<Void> reativarCliente(@PathVariable Long id) {
+        gestaoClienteService.reativarCliente(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
 

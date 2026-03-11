@@ -27,9 +27,6 @@ public class Cliente {
     @Column(nullable = false)
     private boolean ativo = true;
 
-    //Ainda vou implementar a parte de reativar o cliente, por isso os métodos de isAtivo e setAtivo.
-    public boolean isAtivo() { return ativo; }
-    public void setAtivo(boolean ativo) { this.ativo = ativo; }
 
     @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private Nota nota;

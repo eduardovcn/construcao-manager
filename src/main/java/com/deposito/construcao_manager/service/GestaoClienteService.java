@@ -67,11 +67,20 @@ public class GestaoClienteService {
     }
 
     @Transactional
-    public void deletarCliente(Long id) {
-        clienteRepository.findById(id)
+    public void inativarCliente(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
-        clienteRepository.deleteById(id);
+        cliente.setAtivo(false);
+        clienteRepository.save(cliente);
 
+    }
+
+    @Transactional
+    public void reativarCliente(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+        cliente.setAtivo(true);
+        clienteRepository.save(cliente);
     }
 
 
