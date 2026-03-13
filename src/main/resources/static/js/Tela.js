@@ -16,7 +16,7 @@ function mudarTela(idTelaAlvo, elementoClicado) {
         elementoClicado.classList.add('active');
     }
 
-    // 4. Mudar o título e disparar funções de carregamento
+    // 4. Mudar o título e disparar as funções da API baseadas na tela
     const titulo = document.getElementById('tituloPagina');
 
     if (idTelaAlvo === 'telaInicio') {
@@ -24,17 +24,14 @@ function mudarTela(idTelaAlvo, elementoClicado) {
 
     } else if (idTelaAlvo === 'telaVendas') {
         titulo.innerText = 'Gerenciar Vendas';
-        // Chama a função que deve estar no seu Vendas.js
         if(typeof carregarVendas === 'function') carregarVendas();
 
     } else if (idTelaAlvo === 'telaClientes') {
         titulo.innerText = 'Gerenciar Clientes';
-        // Chama a função que deve estar no seu Cliente.js
         if(typeof carregarClientes === 'function') carregarClientes();
 
     } else if (idTelaAlvo === 'telaEstoque') {
         titulo.innerText = 'Controle de Estoque';
-        // Chama a função que deve estar no seu Produto.js
         if(typeof carregarProdutos === 'function') carregarProdutos();
     }
 }

@@ -1,4 +1,3 @@
-// Variável para guardar os clientes e evitar fazer várias requisições ao Java
 let clientesCarregados = [];
 
 // ======================= LISTAR CLIENTES =======================
@@ -10,7 +9,7 @@ async function carregarClientes() {
 
     try {
         const resposta = await fetch('/clientes/listar_clientes');
-        
+
         if (resposta.ok) {
             clientesCarregados = await resposta.json();
             tabelaClientes.innerHTML = '';
@@ -22,7 +21,7 @@ async function carregarClientes() {
 
             clientesCarregados.forEach(cliente => {
                 const row = tabelaClientes.insertRow();
-                
+
                 row.insertCell(0).textContent = cliente.id;
                 row.cells[0].classList.add('ps-4');
                 row.insertCell(1).textContent = cliente.nomeCompleto || '-';
@@ -31,7 +30,6 @@ async function carregarClientes() {
                 row.insertCell(4).textContent = cliente.endereco || '-';
                 row.insertCell(5).textContent = cliente.celular || '-';
 
-                // Botões de Ação
                 let botoesHTML = `
                     <button class="btn btn-sm btn-info text-white me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalAtualizarCliente" onclick="preencherModalAtualizarCliente(${cliente.id})">
                         <i class="fas fa-edit"></i>
@@ -49,12 +47,10 @@ async function carregarClientes() {
                 row.insertCell(6).innerHTML = botoesHTML;
             });
         } else {
-            alert("Erro ao carregar clientes do servidor.");
             tabelaClientes.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Erro ao carregar dados.</td></tr>`;
         }
     } catch (erro) {
         console.error('Erro:', erro);
-        alert("Erro de conexão com o servidor.");
         tabelaClientes.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Falha de conexão.</td></tr>`;
     }
 }
@@ -72,7 +68,7 @@ async function registrarCliente() {
         email: emailInput,
         cpf: cpfInput,
         endereco: enderecoInput,
-        celular: telefoneInput 
+        celular: telefoneInput
     };
 
     try {
@@ -91,8 +87,7 @@ async function registrarCliente() {
             modalInstance.hide();
 
             document.getElementById('formCliente').reset();
-            
-            // Recarrega a tabela se estivermos na tela de clientes
+
             if(!document.getElementById('telaClientes').classList.contains('d-none')) {
                 carregarClientes();
             }
@@ -119,7 +114,7 @@ async function atualizarCliente() {
     const telefoneInput = document.getElementById('telefoneAtualizar').value.trim();
 
     if (!idInput) {
-        alert("Por favor, informe o ID do cliente que deseja atualizar.");
+        alert("Por favor, informe o ID do cliente.");
         return;
     }
 
@@ -152,7 +147,7 @@ async function atualizarCliente() {
             document.getElementById('formAtualizarCliente').reset();
             carregarClientes();
         } else {
-            alert("Erro ao atualizar. Verifique se o ID existe e tente novamente.");
+            alert("Erro ao atualizar. Verifique o ID e tente novamente.");
         }
     } catch (erro) {
         console.error('Erro:', erro);
@@ -177,8 +172,9 @@ function abrirNotaDoCliente(idCliente) {
     const dataFormatada = nota.dataEmissao ? nota.dataEmissao.split('-').reverse().join('/') : '-';
     document.getElementById('detalheVendaData').textContent = dataFormatada;
 
-    document.getElementById('detalheVendaStatus').textContent = nota.status || 'CONCLUÍDO';
-    document.getElementById('detalheVendaStatus').className = "badge bg-success"; // Classe padrão Bootstrap
+    const spanStatus = document.getElementById('detalheVendaStatus');
+    spanStatus.textContent = nota.status || 'CONCLUÍDO';
+    spanStatus.className = 'badge bg-success';
 
     const valorTotal = nota.valorTotal ? nota.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
     document.getElementById('detalheVendaTotal').textContent = valorTotal;
@@ -190,10 +186,11 @@ function abrirNotaDoCliente(idCliente) {
         nota.itens.forEach(item => {
             const precoFormatado = item.precoUnitarioSnapshot ? item.precoUnitarioSnapshot.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
             const subtotalFormatado = item.subTotal ? item.subTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
+            const nomeProd = item.produto && item.produto.nome ? item.produto.nome : `Produto #${item.produtoId || 'N/A'}`;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>Produto #${item.produto ? item.produto.id : 'N/A'}</td>
+                <td>${nomeProd}</td>
                 <td>${item.quantidade}</td>
                 <td>${precoFormatado}</td>
                 <td><strong>${subtotalFormatado}</strong></td>

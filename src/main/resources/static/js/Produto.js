@@ -20,7 +20,6 @@ async function carregarProdutos() {
             produtos.forEach(produto => {
                 const precoFormatado = produto.preco ? produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
 
-                // Badge visual se estoque estiver zerado ou baixo
                 let badgeEstoque = `<span class="badge bg-success">${produto.quantidadeEstoque} un</span>`;
                 if (produto.quantidadeEstoque <= 0) {
                     badgeEstoque = `<span class="badge bg-danger">Sem Estoque</span>`;
@@ -86,7 +85,6 @@ async function registrarProduto() {
 
             document.getElementById('formProduto').reset();
 
-            // Atualiza a tabela se a tela de estoque estiver visível
             if(!document.getElementById('telaEstoque').classList.contains('d-none')) {
                 carregarProdutos();
             }
