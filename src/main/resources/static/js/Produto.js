@@ -34,7 +34,7 @@ async function carregarProdutos() {
                     <td>${precoFormatado}</td>
                     <td>${badgeEstoque}</td>
                     <td>
-                        <button class="btn btn-sm btn-warning" title="Editar Produto">
+                        <button class="btn btn-sm btn-warning" title="Editar Produto" data-bs-toggle="modal" data-bs-target="#modalAtualizarProduto" onclick="preencherModalAtualizarProduto(${produto.id}, '${produto.nome}', ${produto.preco}, ${produto.quantidadeEstoque})">
                             <i class="fas fa-edit"></i>
                         </button>
                     </td>
@@ -90,6 +90,64 @@ async function registrarProduto() {
             }
         } else {
             alert("Erro ao registrar produto. Verifique os dados e tente novamente.");
+        }
+    } catch (erro) {
+        console.error('Erro:', erro);
+        alert("Erro de conexão com o servidor.");
+    }
+}
+
+// ======================= ATUALIZAR PRODUTO =======================
+
+// Função para jogar os dados do produto clicado direto para dentro do modal
+function preencherModalAtualizarProduto(id, nome, preco, quantidadeEstoque) {
+    document.getElementById('idProdutoAtualizar').value = id;
+    document.getElementById('nomeProdutoAtualizar').value = nome;
+    document.getElementById('precoProdutoAtualizar').value = preco;
+    document.getElementById('quantidadeEstoqueAtualizar').value = quantidadeEstoque;
+}
+
+// Função que envia as alterações para a API
+async function atualizarProduto() {
+    const idInput = document.getElementById('idProdutoAtualizar').value.trim();
+    const nomeInput = document.getElementById('nomeProdutoAtualizar').value.trim();
+    const precoInput = document.getElementById('precoProdutoAtualizar').value.trim();
+    const estoqueInput = document.getElementById('quantidadeEstoqueAtualizar').value.trim();
+
+    if (!idInput) {
+        alert("ID do produto não encontrado.");
+        return;
+    }
+
+    const produtoDTO = {};
+    if (nomeInput !== "") produtoDTO.nome = nomeInput;
+    if (precoInput !== "") produtoDTO.preco = parseFloat(precoInput);
+    if (estoqueInput !== "") produtoDTO.quantidadeEstoque = parseInt(estoqueInput);
+
+    if (Object.keys(produtoDTO).length === 0) {
+        alert("Preencha pelo menos um campo para atualizar.");
+        return;
+    }
+
+    try {
+        // Confirme se a sua rota da API de atualização de produto é essa mesma (usei o padrão do cliente)
+        const resposta = await fetch(`/produtos/atualizar_produto/${idInput}`, {
+            method: 'PATCH', // ou PUT, dependendo de como você fez no Spring
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(produtoDTO)
+        });
+
+        if (resposta.ok) {
+            alert("Produto atualizado com sucesso!");
+
+            const modalElement = document.getElementById('modalAtualizarProduto');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+
+            document.getElementById('formAtualizarProduto').reset();
+            carregarProdutos(); // Recarrega a tabela para mostrar as alterações
+        } else {
+            alert("Erro ao atualizar. Verifique os dados e tente novamente.");
         }
     } catch (erro) {
         console.error('Erro:', erro);
