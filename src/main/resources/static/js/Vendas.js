@@ -4,14 +4,20 @@ let itensDaVendaAtual = [];
 document.addEventListener("DOMContentLoaded", function() {
     carregarVendas();
 
-    // Garante que a lista de clientes e produtos já estejam em memória ao carregar a página
+    // Garante que a lista de clientes e produtos já estejam em memória ao carregar a página inicial
     if(typeof carregarClientes === 'function') carregarClientes();
     if(typeof carregarProdutos === 'function') carregarProdutos();
 
     const modalNovaVenda = document.getElementById('modalNovaVenda');
     if (modalNovaVenda) {
-        // Ao abrir o modal, preenche os Datalists (sugestões) de Clientes e Produtos
-        modalNovaVenda.addEventListener('show.bs.modal', function () {
+        // MUDANÇA: 'async function' para forçar o carregamento caso as listas estejam vazias antes de desenhar o datalist
+        modalNovaVenda.addEventListener('show.bs.modal', async function () {
+            if (typeof clientesCarregados !== 'undefined' && clientesCarregados.length === 0) {
+                if(typeof carregarClientes === 'function') await carregarClientes();
+            }
+            if (typeof produtosCarregados !== 'undefined' && produtosCarregados.length === 0) {
+                if(typeof carregarProdutos === 'function') await carregarProdutos();
+            }
             preencherDatalistsNovaVenda();
         });
 
@@ -82,7 +88,6 @@ function aplicarFiltroVendas() {
         if (venda.status === 'PAGO' || venda.status === 'CONCLUÍDO') badgeClass = 'bg-success';
         if (venda.status === 'PENDENTE' || venda.status === 'FIADO') badgeClass = 'bg-warning text-dark';
 
-        // O Status agora possui a classe 'cursor-pointer' e o onclick='alternarStatusVenda(...)'
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td class="ps-4">${venda.id}</td>
@@ -114,7 +119,6 @@ async function alternarStatusVenda(idVenda) {
         });
 
         if (resposta.ok) {
-            // Recarrega as vendas para refletir o novo status
             carregarVendas();
         } else {
             alert("Erro ao alterar o status da venda.");
@@ -167,16 +171,13 @@ function abrirDetalhesDaVenda(idVenda) {
 }
 
 // ======================= LÓGICA DO CARRINHO E AUTOCOMPLETE =======================
-
-// Preenche as <datalist> com os dados salvos em memória
 function preencherDatalistsNovaVenda() {
     const listaClientes = document.getElementById('listaClientes');
     const listaProdutos = document.getElementById('listaProdutos');
 
-    listaClientes.innerHTML = '';
-    listaProdutos.innerHTML = '';
+    if (listaClientes) listaClientes.innerHTML = '';
+    if (listaProdutos) listaProdutos.innerHTML = '';
 
-    // Utiliza a variável do Cliente.js
     if (typeof clientesCarregados !== 'undefined') {
         clientesCarregados.forEach(cliente => {
             const option = document.createElement('option');
@@ -185,7 +186,6 @@ function preencherDatalistsNovaVenda() {
         });
     }
 
-    // Utiliza a variável do Produto.js
     if (typeof produtosCarregados !== 'undefined') {
         produtosCarregados.forEach(produto => {
             const option = document.createElement('option');
@@ -204,10 +204,8 @@ function adicionarItemNaVenda() {
         return;
     }
 
-    // Extrai apenas o número (ID) da string "1 - Cimento"
     const prodId = parseInt(produtoBuscaInput.split(' - ')[0]);
 
-    // Encontra o produto na memória para pegar nome e preço
     const produtoSelecionado = produtosCarregados.find(p => p.id === prodId);
 
     if(!produtoSelecionado) {
@@ -282,7 +280,6 @@ async function registrarVenda() {
         return;
     }
 
-    // Extrai o ID do cliente da string "1 - João"
     const clienteIdNum = parseInt(clienteBuscaInput.split(' - ')[0]);
     if (isNaN(clienteIdNum)) {
         alert("Cliente inválido. Selecione um cliente da lista.");
@@ -297,7 +294,7 @@ async function registrarVenda() {
     const vendaDTO = {
         clienteId: clienteIdNum,
         dataPagamento: dataPagamentoInput ? dataPagamentoInput : null,
-        itens: itensDaVendaAtual.map(i => ({ produtoId: i.produtoId, quantidade: i.quantidade })) // O Back-end só precisa de ID e Qtd
+        itens: itensDaVendaAtual.map(i => ({ produtoId: i.produtoId, quantidade: i.quantidade }))
     };
 
     try {
@@ -316,7 +313,7 @@ async function registrarVenda() {
             modalInstance.hide();
 
             carregarVendas();
-            carregarProdutos(); // Atualiza o estoque ocultamente
+            if(typeof carregarProdutos === 'function') carregarProdutos(); // Atualiza o estoque ocultamente
         } else {
             alert("Erro ao registrar venda. Verifique os dados e o estoque.");
         }

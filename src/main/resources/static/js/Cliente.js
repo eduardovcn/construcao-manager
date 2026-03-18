@@ -88,9 +88,9 @@ async function registrarCliente() {
 
             document.getElementById('formCliente').reset();
 
-            if(!document.getElementById('telaClientes').classList.contains('d-none')) {
-                carregarClientes();
-            }
+            // MUDANÇA PRINCIPAL: Chama o carregarClientes() de forma incondicional
+            // Isso garante que ele sempre vá pro datalist de vendas.
+            carregarClientes();
         } else {
             alert("Erro ao registrar cliente. Verifique os dados e tente novamente.");
         }
@@ -145,6 +145,8 @@ async function atualizarCliente() {
             modalInstance.hide();
 
             document.getElementById('formAtualizarCliente').reset();
+
+            // MUDANÇA: Garante a atualização da lista oculta de clientes
             carregarClientes();
         } else {
             alert("Erro ao atualizar. Verifique o ID e tente novamente.");
