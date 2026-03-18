@@ -3,7 +3,7 @@ package com.deposito.construcao_manager.dto;
 import com.deposito.construcao_manager.domain.Cliente;
 import com.deposito.construcao_manager.domain.Nota;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties; // <-- IMPORT NOVO
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 

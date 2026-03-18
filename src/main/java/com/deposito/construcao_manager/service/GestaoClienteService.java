@@ -63,6 +63,7 @@ public class GestaoClienteService {
         }
 
         Cliente clienteAtualizado = clienteRepository.save(cliente);
+
         return DadosClienteSaidaDTO.from(clienteAtualizado);
     }
 
@@ -82,6 +83,5 @@ public class GestaoClienteService {
         cliente.setAtivo(true);
         clienteRepository.save(cliente);
     }
-
 
 }
