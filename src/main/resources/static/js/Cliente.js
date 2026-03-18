@@ -30,19 +30,20 @@ async function carregarClientes() {
                 row.insertCell(4).textContent = cliente.endereco || '-';
                 row.insertCell(5).textContent = cliente.celular || '-';
 
+                // Botão Editar
                 let botoesHTML = `
                     <button class="btn btn-sm btn-info text-white me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalAtualizarCliente" onclick="preencherModalAtualizarCliente(${cliente.id})">
                         <i class="fas fa-edit"></i>
                     </button>
                 `;
 
-                if (cliente.nota && cliente.nota.id) {
-                    botoesHTML += `
-                        <button class="btn btn-sm btn-outline-primary" onclick="abrirNotaDoCliente(${cliente.id})">
-                            <i class="fas fa-file-invoice"></i> #${cliente.nota.id}
-                        </button>
-                    `;
-                }
+                // NOVO: Botão para abrir o Modal com a LISTA de notas do cliente
+                // Agora ele sempre aparece, ou você pode colocar um if(cliente.notas && cliente.notas.length > 0)
+                botoesHTML += `
+                    <button class="btn btn-sm btn-outline-primary" title="Ver Notas" onclick="abrirModalListaNotas(${cliente.id})">
+                        <i class="fas fa-list"></i> Notas
+                    </button>
+                `;
 
                 row.insertCell(6).innerHTML = botoesHTML;
             });
@@ -56,6 +57,7 @@ async function carregarClientes() {
 }
 
 // ======================= CADASTRAR CLIENTE =======================
+// (Mantido exatamente igual)
 async function registrarCliente() {
     const nomeInput = document.getElementById('nomeCompleto').value;
     const emailInput = document.getElementById('email').value;
@@ -87,9 +89,6 @@ async function registrarCliente() {
             modalInstance.hide();
 
             document.getElementById('formCliente').reset();
-
-            // MUDANÇA PRINCIPAL: Chama o carregarClientes() de forma incondicional
-            // Isso garante que ele sempre vá pro datalist de vendas.
             carregarClientes();
         } else {
             alert("Erro ao registrar cliente. Verifique os dados e tente novamente.");
@@ -101,6 +100,7 @@ async function registrarCliente() {
 }
 
 // ======================= ATUALIZAR CLIENTE =======================
+// (Mantido exatamente igual)
 function preencherModalAtualizarCliente(id) {
     document.getElementById('idAtualizar').value = id;
 }
@@ -145,8 +145,6 @@ async function atualizarCliente() {
             modalInstance.hide();
 
             document.getElementById('formAtualizarCliente').reset();
-
-            // MUDANÇA: Garante a atualização da lista oculta de clientes
             carregarClientes();
         } else {
             alert("Erro ao atualizar. Verifique o ID e tente novamente.");
@@ -157,17 +155,68 @@ async function atualizarCliente() {
     }
 }
 
-// ======================= EXIBIR NOTA DO CLIENTE =======================
-function abrirNotaDoCliente(idCliente) {
+// ======================= LISTAR TODAS AS NOTAS DO CLIENTE =======================
+function abrirModalListaNotas(idCliente) {
     const cliente = clientesCarregados.find(c => c.id === idCliente);
 
-    if (!cliente || !cliente.nota) {
-        alert("Nota não encontrada para este cliente.");
+    if (!cliente) return;
+
+    // Atenção aqui: o backend agora devolve um array "notas" e não mais um objeto "nota"
+    const notas = cliente.notas || [];
+
+    const corpoTabela = document.getElementById('corpoTabelaNotasLista');
+    if (!corpoTabela) {
+        console.error("HTML do modal de lista de notas não encontrado!");
         return;
     }
 
-    const nota = cliente.nota;
+    corpoTabela.innerHTML = '';
 
+    if (notas.length === 0) {
+        corpoTabela.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nenhuma nota registrada para este cliente.</td></tr>';
+    } else {
+        notas.forEach(nota => {
+            const dataFormatada = nota.dataEmissao ? nota.dataEmissao.split('-').reverse().join('/') : '-';
+            const valorTotal = nota.valorTotal ? nota.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
+            const status = nota.status || 'CONCLUÍDO';
+
+            corpoTabela.innerHTML += `
+                <tr>
+                    <td>#${nota.id}</td>
+                    <td>${dataFormatada}</td>
+                    <td><span class="badge bg-success">${status}</span></td>
+                    <td>${valorTotal}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" title="Ver Detalhes/Itens" onclick="abrirDetalhesDeUmaNota(${idCliente}, ${nota.id})">
+                            <i class="fas fa-eye"></i> Ver Itens
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Exibe o novo Modal
+    const modalElement = new bootstrap.Modal(document.getElementById('modalListaNotasCliente'));
+    modalElement.show();
+}
+
+// ======================= EXIBIR ITENS DE UMA NOTA ESPECÍFICA =======================
+// (Sua função antiga, adaptada para receber qual das notas abrir)
+function abrirDetalhesDeUmaNota(idCliente, idNota) {
+    const cliente = clientesCarregados.find(c => c.id === idCliente);
+    if (!cliente || !cliente.notas) return;
+
+    // Busca exatamente a nota que o usuário clicou
+    const nota = cliente.notas.find(n => n.id === idNota);
+    if (!nota) return;
+
+    // Esconde o modal de lista antes de abrir o de detalhes (opcional, para não sobrepor de forma feia)
+    const modalListaElement = document.getElementById('modalListaNotasCliente');
+    const modalListaInstance = bootstrap.Modal.getInstance(modalListaElement);
+    if(modalListaInstance) modalListaInstance.hide();
+
+    // Preenche seu modal antigo normalmente
     document.getElementById('detalheVendaId').textContent = nota.id;
     document.getElementById('detalheVendaCliente').textContent = cliente.nomeCompleto;
 
@@ -203,6 +252,7 @@ function abrirNotaDoCliente(idCliente) {
         tabelaItens.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhuma venda registrada nesta nota.</td></tr>';
     }
 
-    const modalElement = new bootstrap.Modal(document.getElementById('modalDetalhesVenda'));
-    modalElement.show();
+    // Exibe o modal de Detalhes da Venda
+    const modalDetalheElement = new bootstrap.Modal(document.getElementById('modalDetalhesVenda'));
+    modalDetalheElement.show();
 }

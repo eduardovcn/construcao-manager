@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @JsonPropertyOrder({
@@ -29,7 +31,7 @@ public class DadosClienteSaidaDTO {
 
     // A MÁGICA AQUI: Traz a nota com todas as vendas, mas quebra o loop infinito!
     @JsonIgnoreProperties("cliente")
-    private Nota nota;
+    private List<Nota> nota;
 
     public static DadosClienteSaidaDTO from(Cliente clienteSalvo) {
         DadosClienteSaidaDTO dto = new DadosClienteSaidaDTO();
