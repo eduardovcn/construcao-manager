@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/vendas")
 public class GestaoVendaController {
@@ -27,8 +26,13 @@ public class GestaoVendaController {
     @GetMapping("/listar_vendas")
     public ResponseEntity<List<NotaSaidaDTO>> listarVendas() {
         List<NotaSaidaDTO> listaDeVendas = service.listarTodasVendas();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(listaDeVendas);
+        return ResponseEntity.status(HttpStatus.OK).body(listaDeVendas);
     }
 
+    // NOVA ROTA PARA ALTERAR O STATUS
+    @PatchMapping("/alternar_status/{id}")
+    public ResponseEntity<Void> alternarStatus(@PathVariable Long id) {
+        service.alternarStatusVenda(id);
+        return ResponseEntity.noContent().build();
+    }
 }

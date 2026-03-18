@@ -8,6 +8,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        /* Pequeno ajuste para o botão de status parecer clicável */
+        .cursor-pointer { cursor: pointer; transition: opacity 0.2s; }
+        .cursor-pointer:hover { opacity: 0.8; }
+    </style>
 </head>
 <body>
 
@@ -174,7 +180,7 @@
 </div>
 
 <div class="modal fade" id="modalNovaVenda" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header text-white" style="background-color: var(--azul-profundo);">
                 <h5 class="modal-title"><i class="fas fa-cart-plus"></i> Registrar Nova Venda</h5>
@@ -182,28 +188,32 @@
             </div>
             <div class="modal-body">
                 <form id="formVenda">
-                    <div class="mb-3">
-                        <label for="clienteId" class="form-label">ID do Cliente <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="clienteId" placeholder="Ex: 1" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="dataPagamento" class="form-label">Data para Pagamento (Se fiado)</label>
-                        <input type="date" class="form-control" id="dataPagamento">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="clienteBusca" class="form-label">Buscar Cliente (ID ou Nome) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="clienteBusca" list="listaClientes" placeholder="Digite para buscar..." autocomplete="off" required>
+                            <datalist id="listaClientes"></datalist>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dataPagamento" class="form-label">Data p/ Pagamento</label>
+                            <input type="date" class="form-control" id="dataPagamento" title="Deixe em branco se já estiver pago">
+                        </div>
                     </div>
 
                     <hr>
                     <h6 class="text-primary fw-bold"><i class="fas fa-box-open"></i> Adicionar Produtos</h6>
 
                     <div class="row align-items-end mb-3">
-                        <div class="col-5">
-                            <label for="produtoId" class="form-label mb-1"><small>ID do Produto</small></label>
-                            <input type="number" class="form-control form-control-sm" id="produtoId">
+                        <div class="col-md-7">
+                            <label for="produtoBusca" class="form-label mb-1"><small>Buscar Produto (ID ou Nome)</small></label>
+                            <input type="text" class="form-control form-control-sm" id="produtoBusca" list="listaProdutos" placeholder="Digite para buscar..." autocomplete="off">
+                            <datalist id="listaProdutos"></datalist>
                         </div>
-                        <div class="col-4">
+                        <div class="col-md-3">
                             <label for="quantidade" class="form-label mb-1"><small>Qtd.</small></label>
                             <input type="number" class="form-control form-control-sm" id="quantidade" value="1" min="1">
                         </div>
-                        <div class="col-3">
+                        <div class="col-md-2">
                             <button type="button" class="btn btn-sm btn-success w-100" onclick="adicionarItemNaVenda()">
                                 <i class="fas fa-plus"></i> Add
                             </button>
@@ -214,13 +224,15 @@
                         <table class="table table-sm table-bordered mb-0">
                             <thead class="table-light text-center">
                             <tr>
-                                <th>ID Produto</th>
+                                <th>ID</th>
+                                <th class="text-start">Produto</th>
                                 <th>Qtd</th>
+                                <th>Valor Total</th>
                                 <th>Ação</th>
                             </tr>
                             </thead>
                             <tbody id="listaItensVendaTemp" class="text-center">
-                            <tr><td colspan="3" class="text-muted small py-2">Nenhum produto adicionado.</td></tr>
+                            <tr><td colspan="5" class="text-muted small py-2">Nenhum produto adicionado.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -412,7 +424,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/js/Tela.js"></script> <script src="/js/Cliente.js"></script>
+<script src="/js/Tela.js"></script>
+<script src="/js/Cliente.js"></script>
 <script src="/js/Produto.js"></script>
 <script src="/js/Vendas.js"></script>
 

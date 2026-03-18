@@ -1,3 +1,6 @@
+// Variável global para ser usada também na tela de Vendas (Autocomplete)
+let produtosCarregados = [];
+
 // ======================= LISTAR PRODUTOS (ESTOQUE) =======================
 async function carregarProdutos() {
     const tbody = document.getElementById('tabelaEstoqueBody');
@@ -9,15 +12,15 @@ async function carregarProdutos() {
         const resposta = await fetch('/produtos/listar_produtos');
 
         if (resposta.ok) {
-            const produtos = await resposta.json();
+            produtosCarregados = await resposta.json(); // Salva os produtos globalmente
             tbody.innerHTML = '';
 
-            if (produtos.length === 0) {
+            if (produtosCarregados.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Nenhum produto em estoque.</td></tr>';
                 return;
             }
 
-            produtos.forEach(produto => {
+            produtosCarregados.forEach(produto => {
                 const precoFormatado = produto.preco ? produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
 
                 let badgeEstoque = `<span class="badge bg-success">${produto.quantidadeEstoque} un</span>`;
@@ -87,6 +90,8 @@ async function registrarProduto() {
 
             if(!document.getElementById('telaEstoque').classList.contains('d-none')) {
                 carregarProdutos();
+            } else {
+                carregarProdutos(); // Carrega no fundo para atualizar o autocomplete de vendas
             }
         } else {
             alert("Erro ao registrar produto. Verifique os dados e tente novamente.");
@@ -98,8 +103,6 @@ async function registrarProduto() {
 }
 
 // ======================= ATUALIZAR PRODUTO =======================
-
-// Função para jogar os dados do produto clicado direto para dentro do modal
 function preencherModalAtualizarProduto(id, nome, preco, quantidadeEstoque) {
     document.getElementById('idProdutoAtualizar').value = id;
     document.getElementById('nomeProdutoAtualizar').value = nome;
@@ -107,7 +110,6 @@ function preencherModalAtualizarProduto(id, nome, preco, quantidadeEstoque) {
     document.getElementById('quantidadeEstoqueAtualizar').value = quantidadeEstoque;
 }
 
-// Função que envia as alterações para a API
 async function atualizarProduto() {
     const idInput = document.getElementById('idProdutoAtualizar').value.trim();
     const nomeInput = document.getElementById('nomeProdutoAtualizar').value.trim();
@@ -130,9 +132,8 @@ async function atualizarProduto() {
     }
 
     try {
-        // Confirme se a sua rota da API de atualização de produto é essa mesma (usei o padrão do cliente)
         const resposta = await fetch(`/produtos/atualizar_produto/${idInput}`, {
-            method: 'PATCH', // ou PUT, dependendo de como você fez no Spring
+            method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(produtoDTO)
         });
@@ -145,7 +146,7 @@ async function atualizarProduto() {
             modalInstance.hide();
 
             document.getElementById('formAtualizarProduto').reset();
-            carregarProdutos(); // Recarrega a tabela para mostrar as alterações
+            carregarProdutos();
         } else {
             alert("Erro ao atualizar. Verifique os dados e tente novamente.");
         }
