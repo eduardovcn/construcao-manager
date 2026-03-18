@@ -35,7 +35,7 @@ async function carregarVendas() {
     const tbody = document.getElementById('tabelaVendasBody');
     if(!tbody) return;
 
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Carregando vendas...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Carregando vendas...</td></tr>';
 
     try {
         const resposta = await fetch('/vendas/listar_vendas');
@@ -45,11 +45,11 @@ async function carregarVendas() {
             aplicarFiltroVendas();
         } else {
             console.error('Erro ao carregar a lista de vendas do servidor.');
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Erro ao carregar os dados.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Erro ao carregar os dados.</td></tr>`;
         }
     } catch (erro) {
         console.error('Erro de conexão:', erro);
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Falha na conexão com o servidor.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Falha na conexão com o servidor.</td></tr>`;
     }
 }
 
@@ -77,7 +77,7 @@ function aplicarFiltroVendas() {
     });
 
     if (vendasFiltradas.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Nenhuma venda encontrada para este período.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Nenhuma venda encontrada para este período.</td></tr>`;
         return;
     }
 
@@ -88,11 +88,16 @@ function aplicarFiltroVendas() {
         if (venda.status === 'PAGO' || venda.status === 'CONCLUÍDO') badgeClass = 'bg-success';
         if (venda.status === 'PENDENTE' || venda.status === 'FIADO') badgeClass = 'bg-warning text-dark';
 
+        // LÓGICA DO VENCIMENTO ADICIONADA AQUI
+        const vencimentoText = (venda.status === 'PENDENTE' && venda.dataVencimento) ? formatarData(venda.dataVencimento) : '-';
+        const corVencimento = venda.status === 'PENDENTE' ? 'text-danger fw-bold' : 'text-muted';
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td class="ps-4">${venda.id}</td>
             <td>${venda.nomeCliente || 'Cliente Padrão'}</td>
             <td>${formatarData(venda.dataEmissao)}</td>
+            <td class="${corVencimento}">${vencimentoText}</td>
             <td><strong>${valorFormatado}</strong></td>
             <td>
                 <span class="badge ${badgeClass} cursor-pointer shadow-sm" onclick="alternarStatusVenda(${venda.id})" title="Clique para alternar o status">
@@ -120,6 +125,8 @@ async function alternarStatusVenda(idVenda) {
 
         if (resposta.ok) {
             carregarVendas();
+            // Atualiza a lista de clientes para refletir a mudança de status nas notas deles também
+            if(typeof carregarClientes === 'function') carregarClientes();
         } else {
             alert("Erro ao alterar o status da venda.");
         }
@@ -313,6 +320,10 @@ async function registrarVenda() {
             modalInstance.hide();
 
             carregarVendas();
+
+            // ATUALIZA CLIENTES AQUI PARA A NOVA NOTA APARECER IMEDIATAMENTE NA ABA CLIENTES
+            if(typeof carregarClientes === 'function') carregarClientes();
+
             if(typeof carregarProdutos === 'function') carregarProdutos(); // Atualiza o estoque ocultamente
         } else {
             alert("Erro ao registrar venda. Verifique os dados e o estoque.");

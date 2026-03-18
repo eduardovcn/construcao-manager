@@ -29,9 +29,9 @@ public class DadosClienteSaidaDTO {
     private String endereco;
     private String celular;
 
-    // A MÁGICA AQUI: Traz a nota com todas as vendas, mas quebra o loop infinito!
+    //Traz a nota com todas as vendas, mas quebra o loop infinito!
     @JsonIgnoreProperties("cliente")
-    private List<Nota> nota;
+    private List<Nota> notas;
 
     public static DadosClienteSaidaDTO from(Cliente clienteSalvo) {
         DadosClienteSaidaDTO dto = new DadosClienteSaidaDTO();
@@ -43,7 +43,7 @@ public class DadosClienteSaidaDTO {
         dto.setEmail(clienteSalvo.getEmail());
 
         // Mantém a sua lógica original intacta!
-        dto.setNota(clienteSalvo.getNota());
+        dto.setNotas(clienteSalvo.getNotas());
 
         return dto;
     }
