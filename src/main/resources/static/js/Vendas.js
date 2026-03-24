@@ -1,16 +1,16 @@
+// src/main/resources/static/js/Vendas.js
+
 let todasAsVendasCarregadas = [];
 let itensDaVendaAtual = [];
 
 document.addEventListener("DOMContentLoaded", function() {
     carregarVendas();
 
-    // Garante que a lista de clientes e produtos já estejam em memória ao carregar a página inicial
     if(typeof carregarClientes === 'function') carregarClientes();
     if(typeof carregarProdutos === 'function') carregarProdutos();
 
     const modalNovaVenda = document.getElementById('modalNovaVenda');
     if (modalNovaVenda) {
-        // MUDANÇA: 'async function' para forçar o carregamento caso as listas estejam vazias antes de desenhar o datalist
         modalNovaVenda.addEventListener('show.bs.modal', async function () {
             if (typeof clientesCarregados !== 'undefined' && clientesCarregados.length === 0) {
                 if(typeof carregarClientes === 'function') await carregarClientes();
@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
             preencherDatalistsNovaVenda();
         });
 
-        // Ao fechar, limpa tudo
         modalNovaVenda.addEventListener('hidden.bs.modal', function () {
             document.getElementById('formVenda').reset();
             itensDaVendaAtual = [];
@@ -30,7 +29,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-// ======================= LISTAR VENDAS E FILTRAR =======================
 async function carregarVendas() {
     const tbody = document.getElementById('tabelaVendasBody');
     if(!tbody) return;
@@ -88,9 +86,17 @@ function aplicarFiltroVendas() {
         if (venda.status === 'PAGO' || venda.status === 'CONCLUÍDO') badgeClass = 'bg-success';
         if (venda.status === 'PENDENTE' || venda.status === 'FIADO') badgeClass = 'bg-warning text-dark';
 
-        // LÓGICA DO VENCIMENTO ADICIONADA AQUI
-        const vencimentoText = (venda.status === 'PENDENTE' && venda.dataVencimento) ? formatarData(venda.dataVencimento) : '-';
-        const corVencimento = venda.status === 'PENDENTE' ? 'text-danger fw-bold' : 'text-muted';
+        // LÓGICA DO VENCIMENTO ATUALIZADA AQUI
+        let vencimentoText = '-';
+        let corVencimento = 'text-muted';
+
+        if (venda.status === 'PENDENTE') {
+            vencimentoText = venda.dataVencimento ? formatarData(venda.dataVencimento) : '-';
+            corVencimento = 'text-danger fw-bold';
+        } else if (venda.status === 'PAGO' || venda.status === 'CONCLUÍDO') {
+            vencimentoText = venda.dataVencimento ? formatarData(venda.dataVencimento) : '-';
+            corVencimento = 'text-success fw-bold'; // Aplica a cor verde!
+        }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -114,7 +120,6 @@ function aplicarFiltroVendas() {
     });
 }
 
-// ======================= ALTERAR STATUS DA VENDA (PENDENTE <-> PAGO) =======================
 async function alternarStatusVenda(idVenda) {
     if(!confirm("Deseja alterar o status de pagamento desta venda?")) return;
 
@@ -124,9 +129,23 @@ async function alternarStatusVenda(idVenda) {
         });
 
         if (resposta.ok) {
-            carregarVendas();
-            // Atualiza a lista de clientes para refletir a mudança de status nas notas deles também
-            if(typeof carregarClientes === 'function') carregarClientes();
+            await carregarVendas();
+            if(typeof carregarClientes === 'function') await carregarClientes();
+
+            const modalLista = document.getElementById('modalListaNotasCliente');
+            if (modalLista && modalLista.classList.contains('show')) {
+                const cliente = clientesCarregados.find(c => c.notas && c.notas.some(n => n.id === idVenda));
+                if (cliente) abrirModalListaNotas(cliente.id);
+            }
+
+            const modalDetalhes = document.getElementById('modalDetalhesVenda');
+            if (modalDetalhes && modalDetalhes.classList.contains('show')) {
+                const idVendaAberta = parseInt(document.getElementById('detalheVendaId').textContent);
+                if (idVendaAberta === idVenda) {
+                    abrirDetalhesDaVenda(idVenda);
+                }
+            }
+
         } else {
             alert("Erro ao alterar o status da venda.");
         }
@@ -136,9 +155,24 @@ async function alternarStatusVenda(idVenda) {
     }
 }
 
-// ======================= EXIBIR DETALHES DA VENDA =======================
 function abrirDetalhesDaVenda(idVenda) {
-    const venda = todasAsVendasCarregadas.find(v => v.id === idVenda);
+    let venda = todasAsVendasCarregadas.find(v => v.id === idVenda);
+
+    if (!venda && typeof clientesCarregados !== 'undefined') {
+        const cliente = clientesCarregados.find(c => c.notas && c.notas.some(n => n.id === idVenda));
+        if (cliente) {
+            const notaCliente = cliente.notas.find(n => n.id === idVenda);
+            venda = {
+                id: notaCliente.id,
+                nomeCliente: cliente.nomeCompleto,
+                dataEmissao: notaCliente.dataEmissao,
+                status: notaCliente.status,
+                valorTotal: notaCliente.valorTotal,
+                itens: notaCliente.itens
+            };
+        }
+    }
+
     if (!venda) { alert("Detalhes não encontrados."); return; }
 
     document.getElementById('detalheVendaId').textContent = venda.id;
@@ -150,8 +184,10 @@ function abrirDetalhesDaVenda(idVenda) {
     if (venda.status === 'PENDENTE' || venda.status === 'FIADO') badgeClass = 'bg-warning text-dark';
 
     const spanStatus = document.getElementById('detalheVendaStatus');
-    spanStatus.textContent = venda.status || 'PENDENTE';
-    spanStatus.className = `badge ${badgeClass}`;
+    spanStatus.innerHTML = `${venda.status || 'PENDENTE'} <i class="fas fa-exchange-alt ms-1"></i>`;
+    spanStatus.className = `badge ${badgeClass} cursor-pointer shadow-sm`;
+    spanStatus.onclick = () => alternarStatusVenda(venda.id);
+    spanStatus.title = "Clique para alternar o status";
 
     const valorTotal = venda.valorTotal ? venda.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
     document.getElementById('detalheVendaTotal').textContent = valorTotal;
@@ -163,7 +199,7 @@ function abrirDetalhesDaVenda(idVenda) {
         venda.itens.forEach(item => {
             const precoFormatado = item.precoUnitarioSnapshot ? item.precoUnitarioSnapshot.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
             const subtotalFormatado = item.subTotal ? item.subTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
-            const nomeProd = item.produtoNome || `Produto #${item.produtoId}`;
+            const nomeProd = item.produtoNome || (item.produto ? item.produto.nome : `Produto #${item.produtoId}`);
 
             const tr = document.createElement('tr');
             tr.innerHTML = `<td>${nomeProd}</td><td>${item.quantidade}</td><td>${precoFormatado}</td><td><strong>${subtotalFormatado}</strong></td>`;
@@ -173,11 +209,10 @@ function abrirDetalhesDaVenda(idVenda) {
         tabelaItens.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhum item registrado nesta venda.</td></tr>';
     }
 
-    const modalElement = new bootstrap.Modal(document.getElementById('modalDetalhesVenda'));
+    const modalElement = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalhesVenda'));
     modalElement.show();
 }
 
-// ======================= LÓGICA DO CARRINHO E AUTOCOMPLETE =======================
 function preencherDatalistsNovaVenda() {
     const listaClientes = document.getElementById('listaClientes');
     const listaProdutos = document.getElementById('listaProdutos');
@@ -277,7 +312,6 @@ function atualizarTabelaItensTemporarios() {
     });
 }
 
-// ======================= CADASTRAR VENDA (ENVIAR PARA API) =======================
 async function registrarVenda() {
     const clienteBuscaInput = document.getElementById('clienteBusca').value;
     const dataPagamentoInput = document.getElementById('dataPagamento').value;
@@ -320,11 +354,8 @@ async function registrarVenda() {
             modalInstance.hide();
 
             carregarVendas();
-
-            // ATUALIZA CLIENTES AQUI PARA A NOVA NOTA APARECER IMEDIATAMENTE NA ABA CLIENTES
             if(typeof carregarClientes === 'function') carregarClientes();
-
-            if(typeof carregarProdutos === 'function') carregarProdutos(); // Atualiza o estoque ocultamente
+            if(typeof carregarProdutos === 'function') carregarProdutos();
         } else {
             alert("Erro ao registrar venda. Verifique os dados e o estoque.");
         }
@@ -334,7 +365,6 @@ async function registrarVenda() {
     }
 }
 
-// ======================= UTILITÁRIOS =======================
 function formatarData(dataString) {
     if (!dataString) return '--/--/----';
     const partes = dataString.split('-');

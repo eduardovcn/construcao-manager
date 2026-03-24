@@ -73,6 +73,7 @@ public class GestaoVendaService {
             nota.setStatus(StatusPagamento.PENDENTE);
         } else {
             nota.setStatus(StatusPagamento.PAGO);
+            nota.setDataVencimento(LocalDate.now());
         }
 
         notaRepository.save(nota);

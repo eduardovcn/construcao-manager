@@ -1,3 +1,5 @@
+// src/main/resources/static/js/Cliente.js
+
 let clientesCarregados = [];
 
 // ======================= LISTAR CLIENTES =======================
@@ -30,14 +32,12 @@ async function carregarClientes() {
                 row.insertCell(4).textContent = cliente.endereco || '-';
                 row.insertCell(5).textContent = cliente.celular || '-';
 
-                // Botão Editar
                 let botoesHTML = `
                     <button class="btn btn-sm btn-info text-white me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalAtualizarCliente" onclick="preencherModalAtualizarCliente(${cliente.id})">
                         <i class="fas fa-edit"></i>
                     </button>
                 `;
 
-                // Botão para abrir o Modal com a LISTA de notas do cliente
                 botoesHTML += `
                     <button class="btn btn-sm btn-outline-primary" title="Ver Notas" onclick="abrirModalListaNotas(${cliente.id})">
                         <i class="fas fa-list"></i> Notas
@@ -174,22 +174,39 @@ function abrirModalListaNotas(idCliente) {
         notas.forEach(nota => {
             const dataFormatada = nota.dataEmissao ? nota.dataEmissao.split('-').reverse().join('/') : '-';
 
-            // LÓGICA DO VENCIMENTO NO MODAL DO CLIENTE
-            const vencimentoText = (nota.status === 'PENDENTE' && nota.dataVencimento) ? nota.dataVencimento.split('-').reverse().join('/') : '-';
-            const corVencimento = nota.status === 'PENDENTE' ? 'text-danger fw-bold' : 'text-muted';
+            let badgeClass = 'bg-secondary';
+            if (nota.status === 'PAGO' || nota.status === 'CONCLUÍDO') badgeClass = 'bg-success';
+            if (nota.status === 'PENDENTE' || nota.status === 'FIADO') badgeClass = 'bg-warning text-dark';
+
+            const statusText = nota.status || 'PENDENTE';
+
+            // LÓGICA DO VENCIMENTO ATUALIZADA AQUI
+            let vencimentoText = '-';
+            let corVencimento = 'text-muted';
+
+            if (nota.status === 'PENDENTE') {
+                vencimentoText = nota.dataVencimento ? nota.dataVencimento.split('-').reverse().join('/') : '-';
+                corVencimento = 'text-danger fw-bold';
+            } else if (nota.status === 'PAGO' || nota.status === 'CONCLUÍDO') {
+                vencimentoText = nota.dataVencimento ? nota.dataVencimento.split('-').reverse().join('/') : '-';
+                corVencimento = 'text-success fw-bold'; // Aplica a cor verde!
+            }
 
             const valorTotal = nota.valorTotal ? nota.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
-            const status = nota.status || 'CONCLUÍDO';
 
             corpoTabela.innerHTML += `
                 <tr>
                     <td>#${nota.id}</td>
                     <td>${dataFormatada}</td>
                     <td class="${corVencimento}">${vencimentoText}</td>
-                    <td><span class="badge bg-success">${status}</span></td>
+                    <td>
+                        <span class="badge ${badgeClass} cursor-pointer shadow-sm" onclick="alternarStatusVenda(${nota.id})" title="Clique para alternar o status">
+                            ${statusText} <i class="fas fa-exchange-alt ms-1"></i>
+                        </span>
+                    </td>
                     <td>${valorTotal}</td>
                     <td>
-                        <button class="btn btn-sm btn-secondary" title="Ver Detalhes/Itens" onclick="abrirDetalhesDeUmaNota(${idCliente}, ${nota.id})">
+                        <button class="btn btn-sm btn-secondary" title="Ver Detalhes/Itens" onclick="abrirDetalhesDaVenda(${nota.id})">
                             <i class="fas fa-eye"></i> Ver Itens
                         </button>
                     </td>
@@ -198,57 +215,12 @@ function abrirModalListaNotas(idCliente) {
         });
     }
 
-    const modalElement = new bootstrap.Modal(document.getElementById('modalListaNotasCliente'));
+    const modalElement = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalListaNotasCliente'));
     modalElement.show();
 }
 
-// ======================= EXIBIR ITENS DE UMA NOTA ESPECÍFICA =======================
 function abrirDetalhesDeUmaNota(idCliente, idNota) {
-    const cliente = clientesCarregados.find(c => c.id === idCliente);
-    if (!cliente || !cliente.notas) return;
-
-    const nota = cliente.notas.find(n => n.id === idNota);
-    if (!nota) return;
-
-    const modalListaElement = document.getElementById('modalListaNotasCliente');
-    const modalListaInstance = bootstrap.Modal.getInstance(modalListaElement);
-    if(modalListaInstance) modalListaInstance.hide();
-
-    document.getElementById('detalheVendaId').textContent = nota.id;
-    document.getElementById('detalheVendaCliente').textContent = cliente.nomeCompleto;
-
-    const dataFormatada = nota.dataEmissao ? nota.dataEmissao.split('-').reverse().join('/') : '-';
-    document.getElementById('detalheVendaData').textContent = dataFormatada;
-
-    const spanStatus = document.getElementById('detalheVendaStatus');
-    spanStatus.textContent = nota.status || 'CONCLUÍDO';
-    spanStatus.className = 'badge bg-success';
-
-    const valorTotal = nota.valorTotal ? nota.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
-    document.getElementById('detalheVendaTotal').textContent = valorTotal;
-
-    const tabelaItens = document.getElementById('tabelaDetalheItens');
-    tabelaItens.innerHTML = '';
-
-    if (nota.itens && nota.itens.length > 0) {
-        nota.itens.forEach(item => {
-            const precoFormatado = item.precoUnitarioSnapshot ? item.precoUnitarioSnapshot.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
-            const subtotalFormatado = item.subTotal ? item.subTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
-            const nomeProd = item.produto && item.produto.nome ? item.produto.nome : `Produto #${item.produtoId || 'N/A'}`;
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${nomeProd}</td>
-                <td>${item.quantidade}</td>
-                <td>${precoFormatado}</td>
-                <td><strong>${subtotalFormatado}</strong></td>
-            `;
-            tabelaItens.appendChild(tr);
-        });
-    } else {
-        tabelaItens.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhuma venda registrada nesta nota.</td></tr>';
+    if (typeof abrirDetalhesDaVenda === 'function') {
+        abrirDetalhesDaVenda(idNota);
     }
-
-    const modalDetalheElement = new bootstrap.Modal(document.getElementById('modalDetalhesVenda'));
-    modalDetalheElement.show();
 }
