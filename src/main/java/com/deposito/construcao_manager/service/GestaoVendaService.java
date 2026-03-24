@@ -62,13 +62,13 @@ public class GestaoVendaService {
                 .collect(Collectors.toList());
     }
 
-    // NOVO MÉTODO PARA ALTERAR O STATUS
+
     @Transactional
     public void alternarStatusVenda(Long id) {
         Nota nota = notaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Venda não encontrada"));
 
-        // Inverte o status atual
+
         if (nota.getStatus() == StatusPagamento.PAGO) {
             nota.setStatus(StatusPagamento.PENDENTE);
         } else {
