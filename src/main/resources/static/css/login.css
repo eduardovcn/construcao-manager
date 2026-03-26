@@ -1,0 +1,98 @@
+
+
+/* ==========================================
+   ESTILOS DE ACESSIBILIDADE E TEMA DO DEPÓSITO
+   ========================================== */
+body.login-body-bg {
+    background-color: #e9ecef;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 550px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.login-header {
+    background-color: #d9534f;
+    color: white;
+    padding: 35px 20px;
+    text-align: center;
+}
+
+.login-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.login-content {
+    padding: 40px 40px;
+}
+
+.login-card .form-label {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.login-card .form-control-lg {
+    font-size: 1.6rem;
+    padding: 15px 20px;
+    border: 3px solid #ced4da;
+    border-radius: 8px;
+    color: #000;
+}
+
+.login-card .form-control-lg:focus {
+    border-color: #d9534f;
+    box-shadow: 0 0 0 0.35rem rgba(217, 83, 79, 0.3);
+}
+
+.btn-login {
+    background-color: #f0ad4e;
+    color: #212529;
+    font-size: 1.8rem;
+    font-weight: 800;
+    padding: 18px;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.btn-login:hover {
+    background-color: #ec971f;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.icon-large {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    color: #fdfdfd;
+}
+
+.erro-login {
+    display: none;
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 25px;
+    text-align: center;
+    border: 2px solid #f5c6cb;
+}
