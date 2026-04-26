@@ -86,7 +86,6 @@ function aplicarFiltroVendas() {
         if (venda.status === 'PAGO' || venda.status === 'CONCLUÍDO') badgeClass = 'bg-success';
         if (venda.status === 'PENDENTE' || venda.status === 'FIADO') badgeClass = 'bg-warning text-dark';
 
-        // LÓGICA DO VENCIMENTO ATUALIZADA AQUI
         let vencimentoText = '-';
         let corVencimento = 'text-muted';
 
@@ -95,7 +94,7 @@ function aplicarFiltroVendas() {
             corVencimento = 'text-danger fw-bold';
         } else if (venda.status === 'PAGO' || venda.status === 'CONCLUÍDO') {
             vencimentoText = venda.dataVencimento ? formatarData(venda.dataVencimento) : '-';
-            corVencimento = 'text-success fw-bold'; // Aplica a cor verde!
+            corVencimento = 'text-success fw-bold';
         }
 
         const tr = document.createElement('tr');
@@ -113,6 +112,9 @@ function aplicarFiltroVendas() {
             <td>
                 <button class="btn btn-sm btn-info text-white" title="Ver Detalhes" onclick="abrirDetalhesDaVenda(${venda.id})">
                     <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-excluir" title="Excluir Venda" onclick="deletarVenda(${venda.id}, 'vendas')">
+                    <i class="fas fa-trash"></i>
                 </button>
             </td>
         `;
@@ -372,4 +374,45 @@ function formatarData(dataString) {
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
     return dataString;
+}
+
+// ========================================================
+// FUNÇÃO GLOBAL: DELETAR VENDA
+// ========================================================
+window.deletarVenda = async function(vendaId, origem = 'vendas', clienteId = null) {
+    const confirmacao = confirm('ATENÇÃO: Deseja realmente excluir esta venda? O estoque dos produtos será restaurado e esta ação não poderá ser desfeita.');
+
+    if (!confirmacao) {
+        return;
+    }
+
+    try {
+        // Envia a requisição DELETE para a rota que você configurou no Controller
+        const response = await fetch(`/vendas/deletar_venda`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            alert('Venda excluída com sucesso!');
+
+            // Recarrega de acordo com a aba/modal onde a exclusão ocorreu
+            if (origem === 'vendas') {
+                carregarVendas();
+                if(typeof carregarClientes === 'function') carregarClientes(); // Atualiza histórico de clientes
+            }
+
+            if (origem === 'cliente' && clienteId) {
+                if(typeof carregarClientes === 'function') await carregarClientes(); // Puxa cliente do BD atualizado
+                carregarVendas(); // Atualiza aba principal escondida
+                abrirModalListaNotas(clienteId); // Recarrega o Modal visualmente na hora
+            }
+
+        } else {
+            const erroMsg = await response.text();
+            alert(`Erro ao excluir venda: ${erroMsg}`);
+        }
+    } catch (error) {
+        console.error('Erro na requisição DELETE:', error);
+        alert('Erro de conexão ao tentar excluir a venda. Verifique o console.');
+    }
 }

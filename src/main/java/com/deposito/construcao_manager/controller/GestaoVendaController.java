@@ -29,7 +29,7 @@ public class GestaoVendaController {
         return ResponseEntity.status(HttpStatus.OK).body(listaDeVendas);
     }
 
-    // NOVA ROTA PARA ALTERAR O STATUS
+
     @PatchMapping("/alternar_status/{id}")
     public ResponseEntity<Void> alternarStatus(@PathVariable Long id) {
         service.alternarStatusVenda(id);

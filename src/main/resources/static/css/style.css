@@ -1,9 +1,9 @@
 /* --- PALETA DE CORES PERSONALIZADA --- */
 :root {
-    --azul-profundo: #0D3B66;    /* Azul sóbrio e confiável */
-    --amarelo-mostarda: #F4D35E; /* Mostarda para destaque/atenção */
+    --azul-profundo: #0D3B66;
+    --amarelo-mostarda: #F4D35E;
     --branco-puro: #FFFFFF;
-    --cinza-fundo: #F0F2F5;      /* Fundo suave para não cansar a vista */
+    --cinza-fundo: #F0F2F5;
     --texto-escuro: #333333;
 }
 
@@ -134,4 +134,29 @@ body {
     border-radius: 20px;
     font-weight: bold;
     font-size: 0.85rem;
+}
+
+
+
+/* Botão de Excluir Venda Customizado */
+.btn-excluir {
+    background-color: #dc3545; /* Vermelho de alerta */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-excluir:hover {
+    background-color: #c82333;
+    color: white;
+}
+
+
+#modalDetalhesVenda {
+    z-index: 1060 !important;
 }

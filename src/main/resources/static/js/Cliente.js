@@ -180,7 +180,6 @@ function abrirModalListaNotas(idCliente) {
 
             const statusText = nota.status || 'PENDENTE';
 
-            // LÓGICA DO VENCIMENTO ATUALIZADA AQUI
             let vencimentoText = '-';
             let corVencimento = 'text-muted';
 
@@ -189,7 +188,7 @@ function abrirModalListaNotas(idCliente) {
                 corVencimento = 'text-danger fw-bold';
             } else if (nota.status === 'PAGO' || nota.status === 'CONCLUÍDO') {
                 vencimentoText = nota.dataVencimento ? nota.dataVencimento.split('-').reverse().join('/') : '-';
-                corVencimento = 'text-success fw-bold'; // Aplica a cor verde!
+                corVencimento = 'text-success fw-bold';
             }
 
             const valorTotal = nota.valorTotal ? nota.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
@@ -208,6 +207,9 @@ function abrirModalListaNotas(idCliente) {
                     <td>
                         <button class="btn btn-sm btn-secondary" title="Ver Detalhes/Itens" onclick="abrirDetalhesDaVenda(${nota.id})">
                             <i class="fas fa-eye"></i> Ver Itens
+                        </button>
+                        <button class="btn-excluir" title="Excluir Venda" onclick="deletarVenda(${nota.id}, 'cliente', ${idCliente})">
+                            <i class="fas fa-trash"></i> Excluir
                         </button>
                     </td>
                 </tr>
