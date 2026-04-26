@@ -35,4 +35,10 @@ public class GestaoVendaController {
         service.alternarStatusVenda(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/deletar_venda")
+    public ResponseEntity<Void> deletarVenda(@RequestBody Long id) {
+        service.deletarVenda(id);
+        return ResponseEntity.noContent().build();
+    }
 }

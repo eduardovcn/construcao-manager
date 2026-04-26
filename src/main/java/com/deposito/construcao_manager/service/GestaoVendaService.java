@@ -78,4 +78,8 @@ public class GestaoVendaService {
 
         notaRepository.save(nota);
     }
+
+    public void deletarVenda(Long id) {
+        notaRepository.deleteById(id);
+    }
 }
