@@ -36,8 +36,8 @@ public class GestaoVendaController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/deletar_venda")
-    public ResponseEntity<Void> deletarVenda(@RequestBody Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarVenda(@PathVariable Long id) {
         service.deletarVenda(id);
         return ResponseEntity.noContent().build();
     }

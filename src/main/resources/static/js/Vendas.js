@@ -388,7 +388,7 @@ window.deletarVenda = async function(vendaId, origem = 'vendas', clienteId = nul
 
     try {
         // Envia a requisição DELETE para a rota que você configurou no Controller
-        const response = await fetch(`/vendas/deletar_venda`, {
+        const response = await fetch(`/vendas/${vendaId}`, {
             method: 'DELETE'
         });
 
