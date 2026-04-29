@@ -10,9 +10,10 @@
     <link rel="stylesheet" href="/css/style.css">
 
     <style>
-        /* Pequeno ajuste para o botão de status parecer clicável */
         .cursor-pointer { cursor: pointer; transition: opacity 0.2s; }
         .cursor-pointer:hover { opacity: 0.8; }
+        /* Garante que modais de edição fiquem sobrepostos */
+        #modalDetalhesVenda, #modalEditarVenda { z-index: 1060 !important; }
     </style>
 </head>
 <body>
@@ -190,10 +191,14 @@
             <div class="modal-body">
                 <form id="formVenda">
                     <div class="row mb-3">
-                        <div class="col-md-8">
-                            <label for="clienteBusca" class="form-label">Buscar Cliente (ID ou Nome) <span class="text-danger">*</span></label>
+                        <div class="col-md-5">
+                            <label for="clienteBusca" class="form-label">Buscar Cliente <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="clienteBusca" list="listaClientes" placeholder="Digite para buscar..." autocomplete="off" required>
                             <datalist id="listaClientes"></datalist>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="dataEmissaoNova" class="form-label">Data de Emissão <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="dataEmissaoNova" required>
                         </div>
                         <div class="col-md-4">
                             <label for="dataPagamento" class="form-label">Data p/ Pagamento</label>
@@ -237,11 +242,56 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <hr>
+                    <div class="mb-3">
+                        <label for="observacoesNova" class="form-label text-primary fw-bold"><i class="fas fa-comment-dots"></i> Observações da Nota</label>
+                        <textarea class="form-control" id="observacoesNova" rows="2" placeholder="Adicione detalhes de entrega, descontos, frete..."></textarea>
+                    </div>
+
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-warning" onclick="registrarVenda()">Confirmar Venda</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEditarVenda" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> Editar Nota #<span id="editVendaId"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarVenda">
+                    <div class="mb-3">
+                        <label class="form-label">Data de Emissão</label>
+                        <input type="date" class="form-control" id="editDataEmissao">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data de Pagamento (Vencimento)</label>
+                        <input type="date" class="form-control" id="editDataVencimento">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status da Nota</label>
+                        <select class="form-select" id="editStatus">
+                            <option value="PAGO">PAGO / CONCLUÍDO</option>
+                            <option value="PENDENTE">PENDENTE / FIADO</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observações</label>
+                        <textarea class="form-control" id="editObservacoes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="salvarEdicaoVenda()">Salvar Alterações</button>
             </div>
         </div>
     </div>
@@ -256,26 +306,11 @@
             </div>
             <div class="modal-body">
                 <form id="formCliente">
-                    <div class="mb-3">
-                        <label for="nomeCompleto" class="form-label">Nome <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="nomeCompleto" placeholder="Digite o nome completo">
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email <span class="text-muted">(Opcional)</span></label>
-                        <input type="email" class="form-control" id="email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="cpf" class="form-label">CPF <span class="text-muted">(Opcional)</span></label>
-                        <input type="text" class="form-control" id="cpf">
-                    </div>
-                    <div class="mb-3">
-                        <label for="endereco" class="form-label">Endereço <span class="text-muted">(Opcional)</span></label>
-                        <input type="text" class="form-control" id="endereco">
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefone" class="form-label">Telefone <span class="text-muted">(Opcional)</span></label>
-                        <input type="tel" class="form-control" id="telefone">
-                    </div>
+                    <div class="mb-3"><label for="nomeCompleto" class="form-label">Nome <span class="text-danger">*</span></label><input type="text" class="form-control" id="nomeCompleto" placeholder="Digite o nome completo"></div>
+                    <div class="mb-3"><label for="email" class="form-label">Email <span class="text-muted">(Opcional)</span></label><input type="email" class="form-control" id="email"></div>
+                    <div class="mb-3"><label for="cpf" class="form-label">CPF <span class="text-muted">(Opcional)</span></label><input type="text" class="form-control" id="cpf"></div>
+                    <div class="mb-3"><label for="endereco" class="form-label">Endereço <span class="text-muted">(Opcional)</span></label><input type="text" class="form-control" id="endereco"></div>
+                    <div class="mb-3"><label for="telefone" class="form-label">Telefone <span class="text-muted">(Opcional)</span></label><input type="tel" class="form-control" id="telefone"></div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -295,10 +330,7 @@
             </div>
             <div class="modal-body">
                 <form id="formAtualizarCliente">
-                    <div class="mb-3">
-                        <label for="idAtualizar" class="form-label text-info fw-bold">ID do Cliente <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control border-info" id="idAtualizar" required placeholder="Ex: 2">
-                    </div>
+                    <div class="mb-3"><label for="idAtualizar" class="form-label text-info fw-bold">ID do Cliente <span class="text-danger">*</span></label><input type="number" class="form-control border-info" id="idAtualizar" required placeholder="Ex: 2"></div>
                     <hr>
                     <div class="mb-3"><label class="form-label">Novo Nome</label><input type="text" class="form-control" id="nomeAtualizar"></div>
                     <div class="mb-3"><label class="form-label">Novo Email</label><input type="email" class="form-control" id="emailAtualizar"></div>
@@ -366,18 +398,9 @@
             </div>
             <div class="modal-body">
                 <form id="formProduto">
-                    <div class="mb-3">
-                        <label for="nome" class="form-label">Nome</label>
-                        <input type="text" class="form-control" id="nome" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="preco" class="form-label">Preço</label>
-                        <input type="number" class="form-control" id="preco" step="0.01" min="0" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="quantidadeEstoque" class="form-label">Quantidade em Estoque</label>
-                        <input type="number" class="form-control" id="quantidadeEstoque" min="0" required>
-                    </div>
+                    <div class="mb-3"><label for="nome" class="form-label">Nome</label><input type="text" class="form-control" id="nome" required></div>
+                    <div class="mb-3"><label for="preco" class="form-label">Preço</label><input type="number" class="form-control" id="preco" step="0.01" min="0" required></div>
+                    <div class="mb-3"><label for="quantidadeEstoque" class="form-label">Quantidade em Estoque</label><input type="number" class="form-control" id="quantidadeEstoque" min="0" required></div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -397,23 +420,11 @@
             </div>
             <div class="modal-body">
                 <form id="formAtualizarProduto">
-                    <div class="mb-3">
-                        <label for="idProdutoAtualizar" class="form-label text-warning-emphasis fw-bold">ID do Produto <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control border-warning" id="idProdutoAtualizar" required readonly>
-                    </div>
+                    <div class="mb-3"><label for="idProdutoAtualizar" class="form-label text-warning-emphasis fw-bold">ID do Produto <span class="text-danger">*</span></label><input type="number" class="form-control border-warning" id="idProdutoAtualizar" required readonly></div>
                     <hr>
-                    <div class="mb-3">
-                        <label for="nomeProdutoAtualizar" class="form-label">Novo Nome</label>
-                        <input type="text" class="form-control" id="nomeProdutoAtualizar">
-                    </div>
-                    <div class="mb-3">
-                        <label for="precoProdutoAtualizar" class="form-label">Novo Preço</label>
-                        <input type="number" class="form-control" id="precoProdutoAtualizar" step="0.01" min="0">
-                    </div>
-                    <div class="mb-3">
-                        <label for="quantidadeEstoqueAtualizar" class="form-label">Nova Quantidade em Estoque</label>
-                        <input type="number" class="form-control" id="quantidadeEstoqueAtualizar" min="0">
-                    </div>
+                    <div class="mb-3"><label for="nomeProdutoAtualizar" class="form-label">Novo Nome</label><input type="text" class="form-control" id="nomeProdutoAtualizar"></div>
+                    <div class="mb-3"><label for="precoProdutoAtualizar" class="form-label">Novo Preço</label><input type="number" class="form-control" id="precoProdutoAtualizar" step="0.01" min="0"></div>
+                    <div class="mb-3"><label for="quantidadeEstoqueAtualizar" class="form-label">Nova Quantidade em Estoque</label><input type="number" class="form-control" id="quantidadeEstoqueAtualizar" min="0"></div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -423,6 +434,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="modalListaNotasCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -437,7 +449,7 @@
                         <tr>
                             <th># Nota</th>
                             <th>Emissão</th>
-                            <th>Previsáo de Pagamento</th>
+                            <th>Previsão de Pagamento</th>
                             <th>Status</th>
                             <th>Valor Total</th>
                             <th>Ações</th>

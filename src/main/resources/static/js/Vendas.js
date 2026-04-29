@@ -1,4 +1,4 @@
-// src/main/resources/static/js/Vendas.js
+
 
 let todasAsVendasCarregadas = [];
 let itensDaVendaAtual = [];
@@ -19,6 +19,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 if(typeof carregarProdutos === 'function') await carregarProdutos();
             }
             preencherDatalistsNovaVenda();
+
+            // NOVO: Pré-preenche a data de emissão com o dia de hoje, mas deixa livre para mudar
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('dataEmissaoNova').value = hoje;
         });
 
         modalNovaVenda.addEventListener('hidden.bs.modal', function () {
@@ -98,6 +102,7 @@ function aplicarFiltroVendas() {
         }
 
         const tr = document.createElement('tr');
+
         tr.innerHTML = `
             <td class="ps-4">${venda.id}</td>
             <td>${venda.nomeCliente || 'Cliente Padrão'}</td>
@@ -113,7 +118,10 @@ function aplicarFiltroVendas() {
                 <button class="btn btn-sm btn-info text-white" title="Ver Detalhes" onclick="abrirDetalhesDaVenda(${venda.id})">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button class="btn-excluir" title="Excluir Venda" onclick="deletarVenda(${venda.id}, 'vendas')">
+                <button class="btn btn-sm btn-primary text-white" title="Editar Nota" onclick="abrirModalEdicao(${venda.id})">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger text-white" title="Excluir Nota" onclick="deletarVenda(${venda.id}, 'vendas')">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -249,7 +257,6 @@ function adicionarItemNaVenda() {
     }
 
     const prodId = parseInt(produtoBuscaInput.split(' - ')[0]);
-
     const produtoSelecionado = produtosCarregados.find(p => p.id === prodId);
 
     if(!produtoSelecionado) {
@@ -314,12 +321,19 @@ function atualizarTabelaItensTemporarios() {
     });
 }
 
+
 async function registrarVenda() {
     const clienteBuscaInput = document.getElementById('clienteBusca').value;
+    const dataEmissaoInput = document.getElementById('dataEmissaoNova').value;
     const dataPagamentoInput = document.getElementById('dataPagamento').value;
+    const observacoesInput = document.getElementById('observacoesNova').value;
 
     if (!clienteBuscaInput) {
         alert("Por favor, selecione um Cliente.");
+        return;
+    }
+    if (!dataEmissaoInput) {
+        alert("A Data de Emissão é obrigatória.");
         return;
     }
 
@@ -336,7 +350,9 @@ async function registrarVenda() {
 
     const vendaDTO = {
         clienteId: clienteIdNum,
+        dataEmissao: dataEmissaoInput, // Enviando a data escolhida
         dataPagamento: dataPagamentoInput ? dataPagamentoInput : null,
+        observacoes: observacoesInput, // Enviando as observações
         itens: itensDaVendaAtual.map(i => ({ produtoId: i.produtoId, quantidade: i.quantidade }))
     };
 
@@ -376,43 +392,77 @@ function formatarData(dataString) {
     return dataString;
 }
 
-// ========================================================
-// FUNÇÃO GLOBAL: DELETAR VENDA
-// ========================================================
-window.deletarVenda = async function(vendaId, origem = 'vendas', clienteId = null) {
-    const confirmacao = confirm('ATENÇÃO: Deseja realmente excluir esta venda? O estoque dos produtos será restaurado e esta ação não poderá ser desfeita.');
 
-    if (!confirmacao) {
-        return;
-    }
+function abrirModalEdicao(idVenda) {
+    const venda = todasAsVendasCarregadas.find(v => v.id === idVenda);
+    if(!venda) return;
+
+    document.getElementById('editVendaId').textContent = venda.id;
+    document.getElementById('editDataEmissao').value = venda.dataEmissao;
+    document.getElementById('editDataVencimento').value = venda.dataVencimento || '';
+    document.getElementById('editStatus').value = (venda.status === 'CONCLUÍDO') ? 'PAGO' : venda.status;
+    document.getElementById('editObservacoes').value = venda.observacoes || '';
+
+    const modalElement = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditarVenda'));
+    modalElement.show();
+}
+
+async function salvarEdicaoVenda() {
+    const id = document.getElementById('editVendaId').textContent;
+    const dados = {
+        dataEmissao: document.getElementById('editDataEmissao').value,
+        dataPagamento: document.getElementById('editDataVencimento').value || null, // Usamos dataPagamento para manter seu padrão
+        observacoes: document.getElementById('editObservacoes').value,
+        status: document.getElementById('editStatus').value
+    };
 
     try {
-        // Envia a requisição DELETE para a rota que você configurou no Controller
+        const resposta = await fetch(`/vendas/atualizar_venda/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+
+        if (resposta.ok) {
+            alert("Nota atualizada com sucesso!");
+            bootstrap.Modal.getInstance(document.getElementById('modalEditarVenda')).hide();
+            carregarVendas();
+        } else {
+            alert("Erro ao atualizar a venda.");
+        }
+    } catch (erro) {
+        console.error("Erro:", erro);
+        alert("Falha de conexão com o servidor.");
+    }
+}
+
+// Corrigido para não usar Body no Delete, e sim a URL direta (vendaId)
+window.deletarVenda = async function(vendaId, origem = 'vendas', clienteId = null) {
+    const confirmacao = confirm('ATENÇÃO: Deseja realmente excluir esta venda? O estoque dos produtos será restaurado e esta ação não poderá ser desfeita.');
+    if (!confirmacao) return;
+
+    try {
         const response = await fetch(`/vendas/${vendaId}`, {
             method: 'DELETE'
         });
 
         if (response.ok) {
             alert('Venda excluída com sucesso!');
-
-            // Recarrega de acordo com a aba/modal onde a exclusão ocorreu
             if (origem === 'vendas') {
                 carregarVendas();
-                if(typeof carregarClientes === 'function') carregarClientes(); // Atualiza histórico de clientes
+                if(typeof carregarClientes === 'function') carregarClientes();
             }
-
             if (origem === 'cliente' && clienteId) {
-                if(typeof carregarClientes === 'function') await carregarClientes(); // Puxa cliente do BD atualizado
-                carregarVendas(); // Atualiza aba principal escondida
-                abrirModalListaNotas(clienteId); // Recarrega o Modal visualmente na hora
+                if(typeof carregarClientes === 'function') await carregarClientes();
+                carregarVendas();
+                // Se a função existir na tela, recarrega a janela do cliente
+                if(typeof abrirModalListaNotas === 'function') abrirModalListaNotas(clienteId);
             }
-
         } else {
-            const erroMsg = await response.text();
-            alert(`Erro ao excluir venda: ${erroMsg}`);
+            alert(`Erro ao excluir venda.`);
         }
     } catch (error) {
         console.error('Erro na requisição DELETE:', error);
-        alert('Erro de conexão ao tentar excluir a venda. Verifique o console.');
+        alert('Erro de conexão ao tentar excluir a venda.');
     }
 }

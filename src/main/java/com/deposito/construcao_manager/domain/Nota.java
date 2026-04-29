@@ -1,6 +1,5 @@
 package com.deposito.construcao_manager.domain;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -10,8 +9,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 @Entity
 @Getter @Setter
@@ -32,7 +29,9 @@ public class Nota {
     @Enumerated(EnumType.STRING)
     private StatusPagamento status;
 
-    //Se salvar a nota, os itens relacionados também serão salvos. Se excluir a nota, os itens relacionados também serão excluídos.
+    @Column(columnDefinition = "TEXT")
+    private String observacoes;
+
     @OneToMany(mappedBy = "nota", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemNota> itens = new ArrayList<>();
 
@@ -43,6 +42,4 @@ public class Nota {
         item.setNota(this);
         this.valorTotal = this.valorTotal.add(item.getSubTotal());
     }
-
-
 }

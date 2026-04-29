@@ -4,11 +4,12 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.util.List;
 
-// DTO para representar os dados de entrada ao criar ou atualizar uma nota, contendo o ID do cliente, a data de pagamento e a lista de itens
 @Data
 public class NotaEntradaDTO {
-
     private Long clienteId;
-    private LocalDate dataPagamento;
+    private LocalDate dataEmissao;   // NOVO: Data manual
+    private LocalDate dataPagamento; // MANTIDO o seu original
+    private String observacoes;      // NOVO: Campo de texto
+    private String status;           // NOVO: Para usar na edição
     private List<ItemEntradaDTO> itens;
 }
