@@ -3,7 +3,7 @@ package com.deposito.construcao_manager.controller;
 import com.deposito.construcao_manager.dto.DadosProdutoEntradaDTO;
 import com.deposito.construcao_manager.dto.DadosProdutoSaidaDTO;
 import com.deposito.construcao_manager.service.GestaoProdutoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +13,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/produtos")
+@RequiredArgsConstructor
 public class GestaoProdutoController {
 
-    @Autowired
-    private GestaoProdutoService produtoService;
+
+    private final GestaoProdutoService produtoService;
 
     @PostMapping("/cadastrar_produto")
     public ResponseEntity<DadosProdutoSaidaDTO> cadastrarProduto(@RequestBody DadosProdutoEntradaDTO dadosProdutoEntradaDTO) {

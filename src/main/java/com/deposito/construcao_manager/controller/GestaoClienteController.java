@@ -4,7 +4,7 @@ import com.deposito.construcao_manager.dto.DadosClienteEntradaDTO;
 import com.deposito.construcao_manager.dto.DadosClienteSaidaDTO;
 import com.deposito.construcao_manager.service.GestaoClienteService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,11 +12,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/clientes")
-
+@RequiredArgsConstructor
 public class GestaoClienteController {
 
-    @Autowired
-    private GestaoClienteService gestaoClienteService;
+
+    private final GestaoClienteService gestaoClienteService;
 
     @PostMapping("/cadastrar_cliente")
     public ResponseEntity<DadosClienteSaidaDTO> cadastrarCliente(@Valid @RequestBody DadosClienteEntradaDTO clienteEntradaDTO) {
