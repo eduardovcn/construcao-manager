@@ -4,9 +4,9 @@ package com.deposito.construcao_manager.service;
 import com.deposito.construcao_manager.domain.Nota;
 import com.deposito.construcao_manager.repository.NotaRepository;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -25,15 +25,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
+@RequiredArgsConstructor
 public class BackupVendasService {
 
     private static final Logger logger = LoggerFactory.getLogger(BackupVendasService.class);
 
-    @Autowired
-    private NotaRepository notaRepository;
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final NotaRepository notaRepository;
+
+
+    private final JavaMailSender mailSender;
 
     @Value("${app.backup.email-destino}")
     private String emailDestino;

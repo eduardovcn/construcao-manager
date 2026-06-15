@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
+@RequiredArgsConstructor
 @Service
 public class GestaoProdutoService {
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
+
+    private final ProdutoRepository produtoRepository;
 
     public DadosProdutoSaidaDTO criarProduto(DadosProdutoEntradaDTO dadosProdutoEntradaDTO) {
 

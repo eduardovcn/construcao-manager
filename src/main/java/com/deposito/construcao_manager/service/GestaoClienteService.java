@@ -3,16 +3,17 @@ package com.deposito.construcao_manager.service;
 import com.deposito.construcao_manager.domain.*;
 import com.deposito.construcao_manager.dto.*;
 import com.deposito.construcao_manager.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class GestaoClienteService {
 
-    @Autowired private ClienteRepository clienteRepository;
+    private final ClienteRepository clienteRepository;
 
     @Transactional
     public DadosClienteSaidaDTO cadastrarCliente(DadosClienteEntradaDTO clienteEntradaDTO) {
