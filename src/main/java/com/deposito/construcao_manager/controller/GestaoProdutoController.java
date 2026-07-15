@@ -31,7 +31,7 @@ public class GestaoProdutoController {
     @GetMapping("/listar_produtos")
     public ResponseEntity<Page<DadosProdutoSaidaDTO>> listarProdutos(@PageableDefault(size = 10, sort = {"nome"}) Pageable pageable) {
         Page<DadosProdutoSaidaDTO> produtos = produtoService.listarProdutos(pageable);
-        return ResponseEntity.status(HttpStatus.CREATED).body(produtos);
+        return ResponseEntity.ok(produtos);
     }
 
     @PatchMapping("/atualizar_produto/{id}")

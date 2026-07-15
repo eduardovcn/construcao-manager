@@ -8,9 +8,13 @@ const tamanhoPagina = 10;
 async function carregarProdutos(pagina = 0) {
     paginaAtual = pagina; // Atualiza o estado da página atual
     const tbody = document.getElementById('tabelaEstoqueBody');
+    const containerPaginacao = document.getElementById('paginacaoEstoque');
     if (!tbody) return;
 
     tbody.innerHTML = '<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Carregando estoque...</td></tr>';
+    if (containerPaginacao) {
+        containerPaginacao.innerHTML = '';
+    }
 
     try {
         // 1. Passamos a página e o tamanho na URL da requisição
@@ -21,6 +25,11 @@ async function carregarProdutos(pagina = 0) {
             // 2. Extraímos o objeto complexo de paginação retornado pelo Spring
             const dadosPagina = await resposta.json();
 
+            if (dadosPagina.totalPages > 0 && dadosPagina.number >= dadosPagina.totalPages) {
+                carregarProdutos(dadosPagina.totalPages - 1);
+                return;
+            }
+
             // 3. Isolamos apenas a lista de produtos (o Array)
             produtosCarregados = dadosPagina.content;
 
@@ -28,6 +37,9 @@ async function carregarProdutos(pagina = 0) {
 
             if (produtosCarregados.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Nenhum produto em estoque.</td></tr>';
+                if (containerPaginacao) {
+                    containerPaginacao.innerHTML = '';
+                }
                 return;
             }
 
@@ -56,14 +68,81 @@ async function carregarProdutos(pagina = 0) {
                 tbody.appendChild(tr);
             });
 
+            renderizarPaginacaoEstoque(dadosPagina);
+
         } else {
             console.error('Erro ao carregar a lista de produtos. Status:', resposta.status);
             tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Erro ao carregar os dados.</td></tr>`;
+            if (containerPaginacao) {
+                containerPaginacao.innerHTML = '';
+            }
         }
     } catch (erro) {
         console.error('Erro de conexão:', erro);
         tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Falha na conexão com o servidor.</td></tr>`;
+        if (containerPaginacao) {
+            containerPaginacao.innerHTML = '';
+        }
     }
+}
+
+function renderizarPaginacaoEstoque(dadosPagina) {
+    const containerPaginacao = document.getElementById('paginacaoEstoque');
+    if (!containerPaginacao) return;
+
+    const totalPaginas = dadosPagina.totalPages || 0;
+    const paginaAtualApi = dadosPagina.number || 0;
+
+    if (totalPaginas <= 1) {
+        containerPaginacao.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+
+    html += `
+        <li class="page-item ${dadosPagina.first ? 'disabled' : ''}">
+            <button class="page-link" type="button" ${dadosPagina.first ? 'disabled' : ''} onclick="carregarProdutos(0)">
+                &laquo;
+            </button>
+        </li>
+    `;
+
+    html += `
+        <li class="page-item ${dadosPagina.first ? 'disabled' : ''}">
+            <button class="page-link" type="button" ${dadosPagina.first ? 'disabled' : ''} onclick="carregarProdutos(${paginaAtualApi - 1})">
+                &lsaquo;
+            </button>
+        </li>
+    `;
+
+    for (let i = 0; i < totalPaginas; i++) {
+        html += `
+            <li class="page-item ${i === paginaAtualApi ? 'active' : ''}">
+                <button class="page-link" type="button" onclick="carregarProdutos(${i})">
+                    ${i + 1}
+                </button>
+            </li>
+        `;
+    }
+
+    html += `
+        <li class="page-item ${dadosPagina.last ? 'disabled' : ''}">
+            <button class="page-link" type="button" ${dadosPagina.last ? 'disabled' : ''} onclick="carregarProdutos(${paginaAtualApi + 1})">
+                &rsaquo;
+            </button>
+        </li>
+    `;
+
+    html += `
+        <li class="page-item ${dadosPagina.last ? 'disabled' : ''}">
+            <button class="page-link" type="button" ${dadosPagina.last ? 'disabled' : ''} onclick="carregarProdutos(${totalPaginas - 1})">
+                &raquo;
+            </button>
+        </li>
+    `;
+
+    containerPaginacao.innerHTML = html;
 }
 
 // ======================= CADASTRAR PRODUTO =======================
@@ -101,9 +180,9 @@ async function registrarProduto() {
             document.getElementById('formProduto').reset();
 
             if(!document.getElementById('telaEstoque').classList.contains('d-none')) {
-                carregarProdutos();
+                carregarProdutos(paginaAtual);
             } else {
-                carregarProdutos(); // Carrega no fundo para atualizar o autocomplete de vendas
+                carregarProdutos(paginaAtual); // Carrega no fundo para atualizar o autocomplete de vendas
             }
         } else {
             alert("Erro ao registrar produto. Verifique os dados e tente novamente.");
@@ -158,7 +237,7 @@ async function atualizarProduto() {
             modalInstance.hide();
 
             document.getElementById('formAtualizarProduto').reset();
-            carregarProdutos();
+            carregarProdutos(paginaAtual);
         } else {
             alert("Erro ao atualizar. Verifique os dados e tente novamente.");
         }
