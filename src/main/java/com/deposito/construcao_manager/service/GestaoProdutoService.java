@@ -6,6 +6,8 @@ import com.deposito.construcao_manager.dto.DadosProdutoSaidaDTO;
 import com.deposito.construcao_manager.repository.ProdutoRepository;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,10 +28,10 @@ public class GestaoProdutoService {
         return DadosProdutoSaidaDTO.from(produtoSalvo);
     }
 
-    public List<DadosProdutoSaidaDTO> listarProdutos() {
-        List<Produto> produtos = produtoRepository.findAll();
+    public Page<DadosProdutoSaidaDTO> listarProdutos(Pageable pageable) {
+        Page<Produto> produtosPaginados = produtoRepository.findAll(pageable);
 
-        return produtos.stream().map(DadosProdutoSaidaDTO::from).toList();
+        return produtosPaginados.map(DadosProdutoSaidaDTO::from);
     }
 
     public DadosProdutoSaidaDTO atualizarProduto(Long id, DadosProdutoEntradaDTO dadosProdutoEntradaDTO) {

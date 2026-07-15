@@ -4,6 +4,9 @@ import com.deposito.construcao_manager.dto.DadosProdutoEntradaDTO;
 import com.deposito.construcao_manager.dto.DadosProdutoSaidaDTO;
 import com.deposito.construcao_manager.service.GestaoProdutoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +29,8 @@ public class GestaoProdutoController {
     }
 
     @GetMapping("/listar_produtos")
-    public ResponseEntity<List<DadosProdutoSaidaDTO>> listarProdutos() {
-        List<DadosProdutoSaidaDTO> produtos = produtoService.listarProdutos();
+    public ResponseEntity<Page<DadosProdutoSaidaDTO>> listarProdutos(@PageableDefault(size = 10, sort = {"nome"}) Pageable pageable) {
+        Page<DadosProdutoSaidaDTO> produtos = produtoService.listarProdutos(pageable);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtos);
     }
 

@@ -1,18 +1,29 @@
 // Variável global para ser usada também na tela de Vendas (Autocomplete)
 let produtosCarregados = [];
+let paginaAtual = 0;
+const tamanhoPagina = 10;
+
 
 // ======================= LISTAR PRODUTOS (ESTOQUE) =======================
-async function carregarProdutos() {
+async function carregarProdutos(pagina = 0) {
+    paginaAtual = pagina; // Atualiza o estado da página atual
     const tbody = document.getElementById('tabelaEstoqueBody');
     if (!tbody) return;
 
     tbody.innerHTML = '<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Carregando estoque...</td></tr>';
 
     try {
-        const resposta = await fetch('/produtos/listar_produtos');
+        // 1. Passamos a página e o tamanho na URL da requisição
+        const url = `/produtos/listar_produtos?page=${paginaAtual}&size=${tamanhoPagina}&sort=nome,asc`;
+        const resposta = await fetch(url);
 
         if (resposta.ok) {
-            produtosCarregados = await resposta.json(); // Salva os produtos globalmente
+            // 2. Extraímos o objeto complexo de paginação retornado pelo Spring
+            const dadosPagina = await resposta.json();
+
+            // 3. Isolamos apenas a lista de produtos (o Array)
+            produtosCarregados = dadosPagina.content;
+
             tbody.innerHTML = '';
 
             if (produtosCarregados.length === 0) {
@@ -44,8 +55,9 @@ async function carregarProdutos() {
                 `;
                 tbody.appendChild(tr);
             });
+
         } else {
-            console.error('Erro ao carregar a lista de produtos.');
+            console.error('Erro ao carregar a lista de produtos. Status:', resposta.status);
             tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Erro ao carregar os dados.</td></tr>`;
         }
     } catch (erro) {
