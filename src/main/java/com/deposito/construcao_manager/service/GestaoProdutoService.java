@@ -5,13 +5,10 @@ import com.deposito.construcao_manager.dto.DadosProdutoEntradaDTO;
 import com.deposito.construcao_manager.dto.DadosProdutoSaidaDTO;
 import com.deposito.construcao_manager.repository.ProdutoRepository;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 @RequiredArgsConstructor
