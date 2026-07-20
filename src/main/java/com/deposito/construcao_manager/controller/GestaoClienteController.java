@@ -5,6 +5,9 @@ import com.deposito.construcao_manager.dto.DadosClienteSaidaDTO;
 import com.deposito.construcao_manager.service.GestaoClienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,8 +38,8 @@ public class GestaoClienteController {
     }
 
     @GetMapping("/listar_clientes")
-    public ResponseEntity<List<DadosClienteSaidaDTO>> listarClientes() {
-        List<DadosClienteSaidaDTO> clientes = gestaoClienteService.listarClientes();
+    public ResponseEntity<Page<DadosClienteSaidaDTO>> listarClientes(@PageableDefault(size = 10, sort = {"nome"}) Pageable pageable) {
+        Page<DadosClienteSaidaDTO> clientes = gestaoClienteService.listarClientes(pageable);
         return ResponseEntity.ok(clientes);
     }
 

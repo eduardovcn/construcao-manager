@@ -4,6 +4,8 @@ import com.deposito.construcao_manager.domain.*;
 import com.deposito.construcao_manager.dto.*;
 import com.deposito.construcao_manager.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,11 +37,10 @@ public class GestaoClienteService {
         return DadosClienteSaidaDTO.from(cliente);
     }
 
-    public List<DadosClienteSaidaDTO> listarClientes() {
-        List<Cliente> clientes = clienteRepository.findAll();
-        return clientes.stream()
-                .map(DadosClienteSaidaDTO::from)
-                .toList();
+    @Transactional
+    public Page<DadosClienteSaidaDTO> listarClientes(Pageable pageable) {
+        Page<Cliente> clientes = clienteRepository.findAll(pageable);
+        return clientes.map(DadosClienteSaidaDTO::from);
     }
 
     @Transactional
